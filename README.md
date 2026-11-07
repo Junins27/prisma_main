@@ -8,7 +8,7 @@ Versão estática do site institucional da Prisma, preparada para deploy direto 
 - `functions/api/`: Cloudflare Pages Functions que persistem cases e mensagens de contato em D1.
 - `dist/painel/`: painel editorial visual para criar e editar cases sem Django Admin.
 
-## Publicar no Cloudflare Pages
+## Publicar no Cloudflare
 
 Na tela de criação do projeto, conecte este repositório GitHub e use:
 
@@ -20,6 +20,8 @@ Na tela de criação do projeto, conecte este repositório GitHub e use:
 | Build output directory | `dist` |
 
 O arquivo `dist/index.html` é entregue diretamente, eliminando o erro de diretório estático ausente.
+
+Este repositório também declara `wrangler.jsonc`, com `assets.directory` apontando para `./dist`. Portanto, se o projeto tiver sido criado no modo **Workers** (em vez de Pages), o deploy automático também reconhece os arquivos estáticos e mantém a API no mesmo Worker.
 
 ### Ativar painel, cases e formulário de contato
 
