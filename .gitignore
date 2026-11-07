@@ -1,27 +1,9 @@
-# Python
-__pycache__/
-*.py[cod]
-*.pyo
-.venv/
-venv/
-
-# Django
-db.sqlite3
-media/
-staticfiles/
+.wrangler/
+node_modules/
 *.log
-
-# Environment and editors
 .env
 .env.*
-!.env.example
-.idea/
-.vscode/
-.DS_Store
-Thumbs.db
-
-# Test/tool caches
-.coverage
-htmlcov/
-.pytest_cache/
-.ruff_cache/
+__pycache__/
+*.py[cod]
+db.sqlite3
+staticfiles/
