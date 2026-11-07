@@ -1,0 +1,179 @@
+{% extends "portfolio/panel/base.html" %}
+
+{% block title %}{{ page_title }} — Painel Prisma{% endblock %}
+
+{% block panel_content %}
+<div class="panel-page panel-editor-page">
+    <header class="panel-page-header panel-editor-header">
+        <div>
+            <a class="panel-back-link" href="{{ cancel_url }}"><span aria-hidden="true">←</span> Voltar aos cases</a>
+            <p class="panel-kicker">{% if is_editing %}Edição de case{% else %}Novo conteúdo{% endif %}</p>
+            <h1>{{ page_title }}</h1>
+            <p>{% if is_editing %}Revise as informações e salve para atualizar este case.{% else %}Estruture o case antes de decidir quando ele será publicado.{% endif %}</p>
+        </div>
+        {% if project and project.status == 'published' %}
+        <a class="panel-view-link" href="{{ project.get_absolute_url }}" target="_blank" rel="noopener noreferrer">Ver publicado <span aria-hidden="true">↗</span></a>
+        {% endif %}
+    </header>
+
+    <form class="panel-editor" method="post" enctype="multipart/form-data" novalidate data-project-form>
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+        <div class="panel-form-alert panel-editor__alert" role="alert">
+            <strong>Não foi possível salvar.</strong>
+            {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="panel-editor__content">
+            <section class="panel-form-section" aria-labelledby="presentation-title">
+                <header class="panel-form-section__header">
+                    <span aria-hidden="true">01</span>
+                    <div><h2 id="presentation-title">Apresentação</h2><p>Informações usadas nos cards, filtros e buscadores.</p></div>
+                </header>
+                <div class="panel-form-grid">
+                    <div class="panel-field{% if form.front.errors %} panel-field--error{% endif %}">
+                        <label for="{{ form.front.id_for_label }}">{{ form.front.label }} <span aria-hidden="true">*</span></label>
+                        {{ form.front }}
+                        {% if form.front.help_text %}<p class="panel-field__help">{{ form.front.help_text }}</p>{% endif %}
+                        {% for error in form.front.errors %}<p class="panel-field__error" id="{{ form.front.id_for_label }}-error">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div class="panel-field{% if form.category.errors %} panel-field--error{% endif %}">
+                        <label for="{{ form.category.id_for_label }}">{{ form.category.label }} <span aria-hidden="true">*</span></label>
+                        {{ form.category }}
+                        {% for error in form.category.errors %}<p class="panel-field__error" id="{{ form.category.id_for_label }}-error">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div class="panel-field panel-field--full{% if form.title.errors %} panel-field--error{% endif %}">
+                        <div class="panel-field__label-row">
+                            <label for="{{ form.title.id_for_label }}">{{ form.title.label }} <span aria-hidden="true">*</span></label>
+                            <span data-count-for="{{ form.title.id_for_label }}">0 / {{ form.title.field.max_length }}</span>
+                        </div>
+                        {{ form.title }}
+                        {% for error in form.title.errors %}<p class="panel-field__error" id="{{ form.title.id_for_label }}-error">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div class="panel-field panel-field--full{% if form.summary.errors %} panel-field--error{% endif %}">
+                        <div class="panel-field__label-row">
+                            <label for="{{ form.summary.id_for_label }}">{{ form.summary.label }} <span aria-hidden="true">*</span></label>
+                            <span data-count-for="{{ form.summary.id_for_label }}">0 / {{ form.summary.field.max_length }}</span>
+                        </div>
+                        {{ form.summary }}
+                        {% for error in form.summary.errors %}<p class="panel-field__error" id="{{ form.summary.id_for_label }}-error">{{ error }}</p>{% endfor %}
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel-form-section" aria-labelledby="narrative-title">
+                <header class="panel-form-section__header">
+                    <span aria-hidden="true">02</span>
+                    <div><h2 id="narrative-title">Narrativa</h2><p>Registre apenas informações reais e autorizadas sobre o trabalho.</p></div>
+                </header>
+                <div class="panel-form-grid panel-form-grid--narrative">
+                    <div class="panel-field{% if form.challenge.errors %} panel-field--error{% endif %}">
+                        <label for="{{ form.challenge.id_for_label }}">{{ form.challenge.label }} <span aria-hidden="true">*</span></label>
+                        {{ form.challenge }}
+                        {% for error in form.challenge.errors %}<p class="panel-field__error" id="{{ form.challenge.id_for_label }}-error">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div class="panel-field{% if form.solution.errors %} panel-field--error{% endif %}">
+                        <label for="{{ form.solution.id_for_label }}">{{ form.solution.label }} <span aria-hidden="true">*</span></label>
+                        {{ form.solution }}
+                        {% for error in form.solution.errors %}<p class="panel-field__error" id="{{ form.solution.id_for_label }}-error">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div class="panel-field panel-field--full{% if form.deliverables.errors %} panel-field--error{% endif %}">
+                        <div class="panel-field__label-row">
+                            <label for="{{ form.deliverables.id_for_label }}">{{ form.deliverables.label }} <span aria-hidden="true">*</span></label>
+                            <span data-count-for="{{ form.deliverables.id_for_label }}">0 / {{ form.deliverables.field.max_length }}</span>
+                        </div>
+                        {{ form.deliverables }}
+                        {% if form.deliverables.help_text %}<p class="panel-field__help">{{ form.deliverables.help_text }}</p>{% endif %}
+                        {% for error in form.deliverables.errors %}<p class="panel-field__error" id="{{ form.deliverables.id_for_label }}-error">{{ error }}</p>{% endfor %}
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel-form-section" aria-labelledby="media-title">
+                <header class="panel-form-section__header">
+                    <span aria-hidden="true">03</span>
+                    <div><h2 id="media-title">Mídia</h2><p>Imagem de capa, descrição acessível e link complementar.</p></div>
+                </header>
+                <div class="panel-media-layout">
+                    <div class="panel-image-preview" data-image-preview>
+                        <img{% if not project.image %} hidden{% endif %} src="{% if project.image %}{{ project.image.url }}{% endif %}" alt="" data-image-preview-output>
+                        <div class="panel-image-preview__empty{% if project.image %} is-hidden{% endif %}" data-image-preview-empty>
+                            <span aria-hidden="true"><i></i></span>
+                            <strong>Prévia da imagem</strong>
+                            <small>JPG, PNG ou WebP</small>
+                        </div>
+                    </div>
+                    <div class="panel-media-fields">
+                        <div class="panel-field{% if form.image.errors %} panel-field--error{% endif %}">
+                            <label for="{{ form.image.id_for_label }}">{{ form.image.label }}</label>
+                            {{ form.image }}
+                            {% if form.image.help_text %}<p class="panel-field__help">{{ form.image.help_text }}</p>{% endif %}
+                            {% for error in form.image.errors %}<p class="panel-field__error" id="{{ form.image.id_for_label }}-error">{{ error }}</p>{% endfor %}
+                        </div>
+                        <div class="panel-field{% if form.image_alt.errors %} panel-field--error{% endif %}">
+                            <div class="panel-field__label-row">
+                                <label for="{{ form.image_alt.id_for_label }}">{{ form.image_alt.label }}</label>
+                                <span data-count-for="{{ form.image_alt.id_for_label }}">0 / {{ form.image_alt.field.max_length }}</span>
+                            </div>
+                            {{ form.image_alt }}
+                            {% if form.image_alt.help_text %}<p class="panel-field__help">{{ form.image_alt.help_text }}</p>{% endif %}
+                            {% for error in form.image_alt.errors %}<p class="panel-field__error" id="{{ form.image_alt.id_for_label }}-error">{{ error }}</p>{% endfor %}
+                        </div>
+                        <div class="panel-field{% if form.external_url.errors %} panel-field--error{% endif %}">
+                            <label for="{{ form.external_url.id_for_label }}">{{ form.external_url.label }}</label>
+                            {{ form.external_url }}
+                            {% for error in form.external_url.errors %}<p class="panel-field__error" id="{{ form.external_url.id_for_label }}-error">{{ error }}</p>{% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel-form-section" aria-labelledby="publication-title">
+                <header class="panel-form-section__header">
+                    <span aria-hidden="true">04</span>
+                    <div><h2 id="publication-title">Publicação</h2><p>Controle a visibilidade, o destaque e a ordem deste case.</p></div>
+                </header>
+                <div class="panel-form-grid panel-form-grid--publication">
+                    <div class="panel-field{% if form.status.errors %} panel-field--error{% endif %}">
+                        <label for="{{ form.status.id_for_label }}">{{ form.status.label }}</label>
+                        {{ form.status }}
+                        {% for error in form.status.errors %}<p class="panel-field__error" id="{{ form.status.id_for_label }}-error">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div class="panel-field{% if form.sort_order.errors %} panel-field--error{% endif %}">
+                        <label for="{{ form.sort_order.id_for_label }}">{{ form.sort_order.label }}</label>
+                        {{ form.sort_order }}
+                        {% if form.sort_order.help_text %}<p class="panel-field__help">{{ form.sort_order.help_text }}</p>{% endif %}
+                        {% for error in form.sort_order.errors %}<p class="panel-field__error" id="{{ form.sort_order.id_for_label }}-error">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div class="panel-checkbox-field panel-field--full{% if form.featured.errors %} panel-field--error{% endif %}">
+                        {{ form.featured }}
+                        <label for="{{ form.featured.id_for_label }}"><strong>{{ form.featured.label }}</strong><span>{{ form.featured.help_text }}</span></label>
+                        {% for error in form.featured.errors %}<p class="panel-field__error" id="{{ form.featured.id_for_label }}-error">{{ error }}</p>{% endfor %}
+                    </div>
+                </div>
+            </section>
+
+            <div class="panel-form-actions">
+                <a class="panel-cancel" href="{{ cancel_url }}">Cancelar</a>
+                <button class="button" type="submit">{% if is_editing %}Salvar alterações{% else %}Criar case{% endif %} <span aria-hidden="true">→</span></button>
+            </div>
+        </div>
+
+        <aside class="panel-editor__summary" aria-label="Resumo do case">
+            <div class="panel-editor-summary-card">
+                <p class="panel-kicker">Resumo</p>
+                <div class="panel-editor-summary-card__art" aria-hidden="true"><span></span><i></i></div>
+                <span class="panel-summary-front" data-summary-front>Frente do case</span>
+                <h2 data-summary-title>{% firstof form.title.value "Case sem título" %}</h2>
+                <dl>
+                    <div><dt>Status</dt><dd data-summary-status>Rascunho</dd></div>
+                    <div><dt>Modo</dt><dd>{% if is_editing %}Edição{% else %}Criação{% endif %}</dd></div>
+                </dl>
+                <p class="panel-editor-summary-card__note"><span aria-hidden="true">i</span> Publique apenas informações e imagens autorizadas.</p>
+                <button class="button panel-summary-submit" type="submit">{% if is_editing %}Salvar case{% else %}Criar case{% endif %} <span aria-hidden="true">→</span></button>
+            </div>
+        </aside>
+    </form>
+</div>
+{% endblock %}

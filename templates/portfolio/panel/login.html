@@ -1,0 +1,73 @@
+{% extends "portfolio/panel/base.html" %}
+
+{% block title %}Entrar — Painel Prisma{% endblock %}
+
+{% block panel_body %}
+<main class="panel-login" id="panel-content">
+    <section class="panel-login__brand" aria-label="Prisma">
+        <div class="panel-login__brand-inner">
+            <a class="brand panel-login__logo" href="{% url 'portfolio:home' %}" aria-label="Prisma — voltar ao site">
+                <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true">
+                    <path class="brand-mark-outline" d="M20 3 36.5 32H3.5L20 3Z"/>
+                    <path class="brand-mark-face" d="M20 3v29H3.5L20 3Z"/>
+                    <path class="brand-mark-ray" d="M21 19.5h17"/>
+                </svg>
+                <span class="brand-word">PRISMA</span>
+            </a>
+            <div class="panel-login__statement">
+                <p class="eyebrow"><span></span>Conteúdo sob uma nova luz</p>
+                <h1>Cases organizados com <em>clareza.</em></h1>
+                <p>Um espaço reservado para a equipe Prisma preparar, revisar e publicar o portfólio das frentes de Marketing e Tecnologia.</p>
+            </div>
+            <div class="panel-login__prism" aria-hidden="true"><span></span><span></span><i></i></div>
+        </div>
+    </section>
+
+    <section class="panel-login__access" aria-labelledby="login-title">
+        <div class="panel-login__toolbar">
+            <a href="{% url 'portfolio:home' %}" class="text-link"><span aria-hidden="true">←</span> Voltar ao site</a>
+            <div class="theme-switcher panel-login__theme" role="group" aria-label="Escolher versão visual">
+                <button type="button" class="theme-choice" data-theme-choice="golden" aria-pressed="true" title="Tema Golden Hour">
+                    <span class="theme-swatch theme-swatch--golden" aria-hidden="true"></span>
+                    <span class="visually-hidden">Escuro</span>
+                </button>
+                <button type="button" class="theme-choice" data-theme-choice="solar" aria-pressed="false" title="Tema Solar Editorial">
+                    <span class="theme-swatch theme-swatch--solar" aria-hidden="true"></span>
+                    <span class="visually-hidden">Claro</span>
+                </button>
+                <span class="visually-hidden" aria-live="polite" data-theme-status></span>
+            </div>
+        </div>
+
+        <div class="panel-login__form-shell">
+            <p class="panel-kicker">Acesso restrito</p>
+            <h2 id="login-title">Entre no painel</h2>
+            <p class="panel-login__intro">Use suas credenciais administrativas para continuar.</p>
+
+            <form class="panel-form panel-login-form" method="post" action="{% url 'portfolio:panel_login' %}" novalidate>
+                {% csrf_token %}
+                {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+                {% if form.non_field_errors %}
+                <div class="panel-form-alert" role="alert">
+                    {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="panel-field{% if form.username.errors %} panel-field--error{% endif %}">
+                    <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+                    {{ form.username }}
+                    {% for error in form.username.errors %}<p class="panel-field__error" id="{{ form.username.id_for_label }}-error">{{ error }}</p>{% endfor %}
+                </div>
+                <div class="panel-field{% if form.password.errors %} panel-field--error{% endif %}">
+                    <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+                    {{ form.password }}
+                    {% for error in form.password.errors %}<p class="panel-field__error" id="{{ form.password.id_for_label }}-error">{{ error }}</p>{% endfor %}
+                </div>
+
+                <button class="button panel-login__submit" type="submit">Entrar no painel <span aria-hidden="true">→</span></button>
+            </form>
+            <p class="panel-login__note">O acesso e as alterações ficam restritos a usuários autorizados.</p>
+        </div>
+    </section>
+</main>
+{% endblock %}

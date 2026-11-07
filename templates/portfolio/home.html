@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero section" id="inicio">
+    <div class="hero-glow" aria-hidden="true"></div>
+    <div class="container hero-grid">
+        <div class="hero-copy" data-reveal>
+            <p class="eyebrow"><span></span>{{ site_content.hero_eyebrow }}</p>
+            <h1>{{ site_content.hero_title }} <em>{{ site_content.hero_emphasis }}</em></h1>
+            <p class="hero-lead">{{ site_content.hero_lead }}</p>
+            <div class="hero-actions">
+                <a class="button" href="{{ site_content.hero_primary_cta_target }}">{{ site_content.hero_primary_cta_label }} <span aria-hidden="true">↗</span></a>
+                <a class="text-link" href="{{ site_content.hero_secondary_cta_target }}">{{ site_content.hero_secondary_cta_label }} <span aria-hidden="true">↓</span></a>
+            </div>
+            <ul class="hero-capabilities" aria-label="Áreas de atuação">
+                {% for capability in site_content.hero_capabilities_list %}<li>{{ capability }}</li>{% endfor %}
+            </ul>
+        </div>
+
+        <div class="prism-stage" role="img" aria-label="Composição abstrata de um prisma refratando um feixe de luz" data-reveal>
+            <span class="stage-label stage-label--top">clareza / estratégia</span>
+            <span class="stage-label stage-label--bottom">ideia → solução</span>
+            <div class="prism-orbit prism-orbit--one" aria-hidden="true"></div>
+            <div class="prism-orbit prism-orbit--two" aria-hidden="true"></div>
+            <svg class="prism-art" viewBox="0 0 560 520" aria-hidden="true">
+                <defs>
+                    <linearGradient id="prismFill" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0" stop-color="currentColor" stop-opacity=".42"/>
+                        <stop offset=".55" stop-color="currentColor" stop-opacity=".08"/>
+                        <stop offset="1" stop-color="currentColor" stop-opacity=".28"/>
+                    </linearGradient>
+                    <linearGradient id="rayFill" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0" stop-color="currentColor" stop-opacity="0"/>
+                        <stop offset=".5" stop-color="currentColor" stop-opacity=".85"/>
+                        <stop offset="1" stop-color="currentColor" stop-opacity="0"/>
+                    </linearGradient>
+                </defs>
+                <path class="prism-ray prism-ray--in" d="M-40 279 231 249l6 19L-40 309Z" fill="url(#rayFill)"/>
+                <path class="prism-ray prism-ray--out" d="m327 248 256-102 8 19-257 111Z" fill="url(#rayFill)"/>
+                <path class="prism-ray prism-ray--out-2" d="m334 278 262 12-1 18-266-3Z" fill="url(#rayFill)"/>
+                <path class="prism-ray prism-ray--out-3" d="m326 300 250 115-9 17-253-106Z" fill="url(#rayFill)"/>
+                <path class="prism-main" d="M278 104 418 354H133L278 104Z" fill="url(#prismFill)"/>
+                <path class="prism-facet" d="m278 104 1 250H133L278 104Z"/>
+                <path class="prism-edge" d="M278 104 418 354H133L278 104Z"/>
+                <circle class="prism-point" cx="278" cy="104" r="4"/>
+                <circle class="prism-point" cx="418" cy="354" r="4"/>
+                <circle class="prism-point" cx="133" cy="354" r="4"/>
+            </svg>
+            <div class="stage-card" aria-hidden="true">
+                <span>perspectiva</span>
+                <strong>Prisma</strong>
+                <i></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section front-gateway" id="frentes" aria-labelledby="fronts-title">
+    <div class="container">
+        <div class="section-heading front-gateway__intro" data-reveal>
+            <div>
+                <p class="eyebrow"><span></span>{{ site_content.fronts_eyebrow }}</p>
+                <h2 id="fronts-title">{{ site_content.fronts_title }} <em>{{ site_content.fronts_emphasis }}</em></h2>
+            </div>
+            <p>{{ site_content.fronts_intro }}</p>
+        </div>
+
+        <div class="front-grid">
+            {% for front_item in fronts %}
+            <a class="front-card front-card--{{ front_item.slug }}" href="{{ front_item.get_absolute_url }}" data-reveal>
+                <span class="front-card__index" aria-hidden="true">{{ forloop.counter|stringformat:"02d" }}</span>
+                <span class="front-card__motif" aria-hidden="true"><i></i><i></i><i></i></span>
+                <span class="front-card__kicker">{{ front_item.eyebrow }}</span>
+                <h3 class="front-card__title">{{ front_item.title }}</h3>
+                <span class="front-card__headline">{{ front_item.headline }}{% if front_item.headline_emphasis %} <em>{{ front_item.headline_emphasis }}</em>{% endif %}</span>
+                <span class="front-card__lead">{{ front_item.summary }}</span>
+                <span class="front-card__cta">{{ front_item.cta_label }} <span aria-hidden="true">↗</span></span>
+            </a>
+            {% empty %}
+            <p class="empty-state">As frentes principais serão apresentadas aqui assim que o conteúdo for publicado.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="trust-line" aria-label="Proposta de valor">
+    <div class="container trust-line-inner">
+        <p>Uma visão integrada, da estratégia à evolução.</p>
+        <div class="marquee" aria-hidden="true">
+            <span>Clareza</span><i></i><span>Engenharia</span><i></i><span>Experiência</span><i></i><span>Dados</span>
+        </div>
+    </div>
+</section>
+
+<section class="section services" id="servicos">
+    <div class="container">
+        <div class="section-heading" data-reveal>
+            <div>
+                <p class="eyebrow"><span></span>{{ site_content.services_eyebrow }}</p>
+                <h2>{{ site_content.services_title }} <em>{{ site_content.services_emphasis }}</em></h2>
+            </div>
+            <p>{{ site_content.services_intro }}</p>
+        </div>
+
+        <div class="service-groups">
+            {% for front_item in fronts %}
+            <section class="service-front service-front--{{ front_item.slug }}" aria-labelledby="services-{{ front_item.slug }}" data-reveal>
+                <header class="service-front__header">
+                    <div>
+                        <p class="eyebrow"><span></span>{{ front_item.eyebrow }}</p>
+                        <h3 id="services-{{ front_item.slug }}">{{ front_item.title }}</h3>
+                    </div>
+                    <a class="text-link" href="{{ front_item.get_absolute_url }}">Conhecer a frente <span aria-hidden="true">→</span></a>
+                </header>
+                <div class="service-grid service-grid--front">
+                    {% for service in front_item.services.all %}
+                    <article class="service-card">
+                        <span class="service-index">{{ forloop.counter|stringformat:"02d" }}</span>
+                        <div class="service-icon{% if service.visual_key %} service-icon--{{ service.visual_key }}{% endif %}" aria-hidden="true"><span></span><span></span><span></span></div>
+                        <h4>{{ service.title }}</h4>
+                        <p>{{ service.description }}</p>
+                        {% if service.tags_list %}
+                        <ul>{% for tag in service.tags_list %}<li>{{ tag }}</li>{% endfor %}</ul>
+                        {% endif %}
+                    </article>
+                    {% empty %}
+                    <p class="empty-state">Os serviços desta frente estão sendo organizados para publicação.</p>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="section difference" id="diferenciais">
+    <div class="container difference-grid">
+        <div class="difference-copy" data-reveal>
+            <p class="eyebrow"><span></span>{{ site_content.differences_eyebrow }}</p>
+            <h2>{{ site_content.differences_title }}<br><em>{{ site_content.differences_emphasis }}</em></h2>
+            <p>{{ site_content.differences_body }}</p>
+            <a class="text-link" href="#processo">Conheça nosso processo <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="principle-list">
+            <article data-reveal>
+                <span>01</span>
+                <div><h3>Clareza antes da complexidade</h3><p>Traduzimos decisões técnicas e estratégicas para uma linguagem que todos conseguem acompanhar.</p></div>
+            </article>
+            <article data-reveal>
+                <span>02</span>
+                <div><h3>Design e engenharia juntos</h3><p>A experiência de uso e a viabilidade técnica evoluem na mesma direção, desde o início.</p></div>
+            </article>
+            <article data-reveal>
+                <span>03</span>
+                <div><h3>Soluções adequadas ao contexto</h3><p>Sem fórmulas prontas: o escopo nasce do problema, das pessoas e dos objetivos reais.</p></div>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="section portfolio-section" id="portfolio">
+    <div class="container">
+        <div class="section-heading section-heading--portfolio" data-reveal>
+            <div>
+                <p class="eyebrow"><span></span>{{ site_content.cases_eyebrow }}</p>
+                <h2>{{ site_content.cases_title }} <em>{{ site_content.cases_emphasis }}</em></h2>
+            </div>
+            <p>{{ site_content.cases_intro }}</p>
+        </div>
+
+        {% if projects %}
+        <div class="project-grid">
+            {% for project in projects %}
+            <article class="project-card{% if project.featured %} project-card--featured{% endif %}" data-reveal>
+                <a class="project-visual" href="{{ project.get_absolute_url }}" aria-label="Ver projeto {{ project.title }}">
+                    {% if project.image %}
+                    <img src="{{ project.image.url }}" alt="{{ project.image_alt }}" loading="lazy" width="960" height="600">
+                    {% else %}
+                    <div class="project-art" aria-hidden="true"><span></span><span></span><i></i></div>
+                    {% endif %}
+                    <span class="project-arrow" aria-hidden="true">↗</span>
+                </a>
+                <div class="project-meta"><span>{{ project.front.title }} · {{ project.category }}</span><span>Case autorizado</span></div>
+                <h3><a href="{{ project.get_absolute_url }}">{{ project.title }}</a></h3>
+                <p>{{ project.summary }}</p>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="project-grid project-grid--placeholders">
+            {% for front_item in fronts %}
+            <article class="project-card project-placeholder" data-reveal>
+                <div class="project-visual project-visual--placeholder project-visual--{{ front_item.slug }}">
+                    <div class="project-art" aria-hidden="true"><span></span><span></span><i></i></div>
+                    <span class="placeholder-badge">Espaço reservado</span>
+                </div>
+                <div class="project-meta"><span>{{ front_item.title }}</span><span>Case em preparação</span></div>
+                <h3>Case de {{ front_item.title }}</h3>
+                <p>Este espaço receberá um case real e autorizado desta frente quando estiver pronto para publicação.</p>
+            </article>
+            {% endfor %}
+        </div>
+        <p class="portfolio-note"><span aria-hidden="true">i</span> Nenhum cliente, resultado ou número fictício foi utilizado. Publique projetos reais pela área administrativa.</p>
+        {% endif %}
+    </div>
+</section>
+
+<section class="section process" id="processo">
+    <div class="container">
+        <div class="section-heading" data-reveal>
+            <div>
+                <p class="eyebrow"><span></span>{{ site_content.process_eyebrow }}</p>
+                <h2>{{ site_content.process_title }} <em>{{ site_content.process_emphasis }}</em></h2>
+            </div>
+            <p>{{ site_content.process_intro }}</p>
+        </div>
+        <ol class="process-list">
+            <li data-reveal><span>01</span><div class="process-dot"></div><h3>Entender</h3><p>Contexto, pessoas, objetivos e restrições.</p></li>
+            <li data-reveal><span>02</span><div class="process-dot"></div><h3>Planejar</h3><p>Prioridades, arquitetura, experiência e caminho de entrega.</p></li>
+            <li data-reveal><span>03</span><div class="process-dot"></div><h3>Construir</h3><p>Design e desenvolvimento com ciclos de validação.</p></li>
+            <li data-reveal><span>04</span><div class="process-dot"></div><h3>Evoluir</h3><p>Aprendizado, melhoria e próximos movimentos.</p></li>
+        </ol>
+    </div>
+</section>
+
+<section class="section contact" id="contato">
+    <div class="container contact-shell">
+        <div class="contact-copy" data-reveal>
+            <p class="eyebrow"><span></span>{{ site_content.contact_eyebrow }}</p>
+            <h2>{{ site_content.contact_title }} <em>{{ site_content.contact_emphasis }}</em></h2>
+            <p>{{ site_content.contact_intro }}</p>
+            <div class="contact-detail">
+                <span aria-hidden="true">01</span>
+                <p><strong>Contato direto</strong><br>Canal comercial a definir</p>
+            </div>
+            <div class="contact-detail">
+                <span aria-hidden="true">02</span>
+                <p><strong>Atendimento</strong><br>Formato e disponibilidade a definir</p>
+            </div>
+        </div>
+
+        <form class="contact-form" method="post" action="#contato" novalidate data-reveal>
+            {% csrf_token %}
+            {% if contact_form.non_field_errors %}
+            <div class="form-alert" role="alert">{{ contact_form.non_field_errors }}</div>
+            {% endif %}
+            <div class="form-row">
+                <div class="field{% if contact_form.name.errors %} field--error{% endif %}">
+                    <label for="{{ contact_form.name.id_for_label }}">{{ contact_form.name.label }} <span aria-hidden="true">*</span></label>
+                    {{ contact_form.name }}
+                    {% for error in contact_form.name.errors %}<p class="field-error" id="{{ contact_form.name.id_for_label }}-error">{{ error }}</p>{% endfor %}
+                </div>
+                <div class="field{% if contact_form.email.errors %} field--error{% endif %}">
+                    <label for="{{ contact_form.email.id_for_label }}">{{ contact_form.email.label }} <span aria-hidden="true">*</span></label>
+                    {{ contact_form.email }}
+                    {% for error in contact_form.email.errors %}<p class="field-error" id="{{ contact_form.email.id_for_label }}-error">{{ error }}</p>{% endfor %}
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="field{% if contact_form.company.errors %} field--error{% endif %}">
+                    <label for="{{ contact_form.company.id_for_label }}">{{ contact_form.company.label }} <span class="optional">opcional</span></label>
+                    {{ contact_form.company }}
+                    {% for error in contact_form.company.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+                </div>
+                <div class="field{% if contact_form.project_type.errors %} field--error{% endif %}">
+                    <label for="{{ contact_form.project_type.id_for_label }}">{{ contact_form.project_type.label }} <span aria-hidden="true">*</span></label>
+                    {{ contact_form.project_type }}
+                    {% for error in contact_form.project_type.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+                </div>
+            </div>
+            <div class="field{% if contact_form.message.errors %} field--error{% endif %}">
+                <label for="{{ contact_form.message.id_for_label }}">{{ contact_form.message.label }} <span aria-hidden="true">*</span></label>
+                {{ contact_form.message }}
+                <div class="field-meta"><span>Evite incluir informações sigilosas.</span><span data-character-count>0 / 3000</span></div>
+                {% for error in contact_form.message.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+            </div>
+            <div class="honeypot" aria-hidden="true">
+                <label for="{{ contact_form.website.id_for_label }}">{{ contact_form.website.label }}</label>
+                {{ contact_form.website }}
+            </div>
+            <div class="consent{% if contact_form.privacy_consent.errors %} field--error{% endif %}">
+                {{ contact_form.privacy_consent }}
+                <label for="{{ contact_form.privacy_consent.id_for_label }}">{{ contact_form.privacy_consent.label }}</label>
+                {% for error in contact_form.privacy_consent.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+            </div>
+            <button class="button form-submit" type="submit">Enviar mensagem <span aria-hidden="true">↗</span></button>
+            <p class="form-note">Os dados não são enviados a serviços externos nesta versão.</p>
+        </form>
+    </div>
+</section>
+{% endblock %}

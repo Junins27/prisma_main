@@ -1,0 +1,127 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-BR" data-theme="{{ selected_theme.key|default:'golden' }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="{{ selected_theme.theme_color|default:'#13171B' }}" id="theme-color-meta">
+    <meta name="color-scheme" content="dark light">
+    <title>{% block title %}Painel Prisma{% endblock %}</title>
+    <script>
+        (() => {
+            const root = document.documentElement;
+            root.classList.add("js");
+            try {
+                const stored = localStorage.getItem("prisma-theme");
+                if (stored === "golden" || stored === "solar") root.dataset.theme = stored;
+            } catch (error) {
+                // O tema escuro permanece como padrão quando o armazenamento está indisponível.
+            }
+        })();
+    </script>
+    <link rel="stylesheet" href="{% static 'portfolio/css/site.css' %}">
+    <link rel="stylesheet" href="{% static 'portfolio/css/panel.css' %}">
+</head>
+<body class="panel-body" data-panel-page="{{ request.resolver_match.url_name|default:'panel' }}">
+    <a class="skip-link" href="#panel-content">Pular para o conteúdo</a>
+
+    {% block panel_body %}
+    <header class="panel-mobile-header">
+        <a class="brand" href="{% url 'portfolio:panel_dashboard' %}" aria-label="Prisma Painel — página inicial">
+            <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true">
+                <path class="brand-mark-outline" d="M20 3 36.5 32H3.5L20 3Z"/>
+                <path class="brand-mark-face" d="M20 3v29H3.5L20 3Z"/>
+                <path class="brand-mark-ray" d="M21 19.5h17"/>
+            </svg>
+            <span class="brand-word">PRISMA</span>
+            <span class="panel-brand-label">Painel</span>
+        </a>
+        <button class="panel-menu-toggle" type="button" aria-expanded="false" aria-controls="panel-navigation" data-panel-menu-toggle>
+            <span class="visually-hidden">Abrir menu do painel</span>
+            <span aria-hidden="true"></span><span aria-hidden="true"></span>
+        </button>
+    </header>
+
+    <div class="panel-overlay" data-panel-overlay aria-hidden="true"></div>
+    <div class="panel-shell">
+        <aside class="panel-sidebar" id="panel-navigation" aria-label="Navegação do painel" data-panel-sidebar>
+            <div class="panel-sidebar__top">
+                <a class="brand panel-brand" href="{% url 'portfolio:panel_dashboard' %}" aria-label="Prisma Painel — página inicial">
+                    <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true">
+                        <path class="brand-mark-outline" d="M20 3 36.5 32H3.5L20 3Z"/>
+                        <path class="brand-mark-face" d="M20 3v29H3.5L20 3Z"/>
+                        <path class="brand-mark-ray" d="M21 19.5h17"/>
+                    </svg>
+                    <span class="brand-word">PRISMA</span>
+                    <span class="panel-brand-label">Painel</span>
+                </a>
+                <p class="panel-sidebar__eyebrow">Conteúdo &amp; cases</p>
+            </div>
+
+            <nav class="panel-nav" aria-label="Seções do painel">
+                <a href="{% url 'portfolio:panel_dashboard' %}"{% if request.resolver_match.url_name == 'panel_dashboard' %} aria-current="page"{% endif %}>
+                    <span class="panel-nav__icon" aria-hidden="true"><i></i><i></i><i></i></span>
+                    <span><strong>Cases</strong><small>Visão geral</small></span>
+                </a>
+                {% if perms.portfolio.add_project %}
+                <a href="{% url 'portfolio:panel_project_create' %}"{% if request.resolver_match.url_name == 'panel_project_create' %} aria-current="page"{% endif %}>
+                    <span class="panel-nav__icon panel-nav__icon--plus" aria-hidden="true"></span>
+                    <span><strong>Novo case</strong><small>Adicionar projeto</small></span>
+                </a>
+                {% endif %}
+                <a href="{% url 'portfolio:home' %}" target="_blank" rel="noopener noreferrer">
+                    <span class="panel-nav__icon panel-nav__icon--arrow" aria-hidden="true">↗</span>
+                    <span><strong>Ver site</strong><small>Abre em nova guia</small></span>
+                </a>
+            </nav>
+
+            <div class="panel-sidebar__bottom">
+                <div class="panel-theme">
+                    <p>Aparência</p>
+                    <div class="theme-switcher" role="group" aria-label="Escolher versão visual do painel">
+                        <button type="button" class="theme-choice" data-theme-choice="golden" aria-pressed="true" title="Tema Golden Hour">
+                            <span class="theme-swatch theme-swatch--golden" aria-hidden="true"></span>
+                            <span>Escuro</span>
+                        </button>
+                        <button type="button" class="theme-choice" data-theme-choice="solar" aria-pressed="false" title="Tema Solar Editorial">
+                            <span class="theme-swatch theme-swatch--solar" aria-hidden="true"></span>
+                            <span>Claro</span>
+                        </button>
+                        <span class="visually-hidden" aria-live="polite" data-theme-status></span>
+                    </div>
+                </div>
+
+                <div class="panel-user">
+                    <span class="panel-user__avatar" aria-hidden="true">{{ request.user.username|slice:":1"|upper }}</span>
+                    <span class="panel-user__identity">
+                        <strong>{% firstof request.user.get_full_name request.user.username %}</strong>
+                        <small>Equipe Prisma</small>
+                    </span>
+                    <form method="post" action="{% url 'portfolio:panel_logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="panel-logout" aria-label="Sair do painel" title="Sair">&#8594;</button>
+                    </form>
+                </div>
+            </div>
+        </aside>
+
+        <main class="panel-main" id="panel-content" tabindex="-1">
+            {% if messages %}
+            <div class="panel-message-stack" aria-live="polite" aria-atomic="true">
+                {% for message in messages %}
+                <div class="panel-message panel-message--{{ message.tags|default:'info' }}">
+                    <span>{{ message }}</span>
+                    <button type="button" aria-label="Fechar aviso" data-dismiss-message>&times;</button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% block panel_content %}{% endblock %}
+        </main>
+    </div>
+    {% endblock %}
+
+    <script src="{% static 'portfolio/js/panel.js' %}" defer></script>
+</body>
+</html>

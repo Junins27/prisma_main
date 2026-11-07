@@ -1,0 +1,35 @@
+{% extends "admin/index.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'portfolio/css/admin.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="prisma-admin-hero" aria-labelledby="prisma-admin-title">
+    <div>
+        <p class="prisma-admin-kicker">Painel editorial</p>
+        <h1 id="prisma-admin-title">Marketing e Tecnologia em primeiro plano.</h1>
+        <p>Atualize o conteúdo global, organize os serviços de cada frente e publique somente cases autorizados.</p>
+    </div>
+    <div class="prisma-admin-shortcuts" aria-label="Atalhos editoriais">
+        <a href="{% url 'admin:portfolio_sitecontent_changelist' %}">
+            <span>01</span>
+            <strong>Conteúdo do site</strong>
+            <small>Hero, seções e chamadas globais</small>
+        </a>
+        <a href="{% url 'admin:portfolio_businessfront_changelist' %}">
+            <span>02</span>
+            <strong>Frentes de atuação</strong>
+            <small>Marketing, Tecnologia e serviços</small>
+        </a>
+        <a href="{% url 'admin:portfolio_project_changelist' %}">
+            <span>03</span>
+            <strong>Cases</strong>
+            <small>Conteúdo, mídia e publicação</small>
+        </a>
+    </div>
+</section>
+{{ block.super }}
+{% endblock %}

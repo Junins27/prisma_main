@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.title }} — Prisma{% endblock %}
+{% block og_title %}{{ project.title }} — Prisma{% endblock %}
+{% block meta_description %}{{ project.summary }}{% endblock %}
+
+{% block content %}
+<article class="project-detail">
+    <header class="project-detail-hero section">
+        <div class="container">
+            <a class="back-link" href="{{ project.front.get_absolute_url }}#cases"><span aria-hidden="true">←</span> Voltar para {{ project.front.title }}</a>
+            <div class="project-detail-heading" data-reveal>
+                <div>
+                    <p class="eyebrow"><span></span>{{ project.front.title }} · {{ project.category }}</p>
+                    <h1>{{ project.title }}</h1>
+                </div>
+                <p>{{ project.summary }}</p>
+            </div>
+            <div class="project-detail-visual" data-reveal>
+                {% if project.image %}
+                <img src="{{ project.image.url }}" alt="{{ project.image_alt }}" width="1440" height="900">
+                {% else %}
+                <div class="project-art project-art--large" role="img" aria-label="Composição abstrata para o projeto {{ project.title }}"><span></span><span></span><i></i></div>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <section class="section project-story">
+        <div class="container project-story-grid">
+            <aside data-reveal>
+                <p class="detail-label">Entregáveis</p>
+                <ul>
+                    {% for item in project.deliverables_list %}<li>{{ item }}</li>{% endfor %}
+                </ul>
+                {% if project.external_url %}
+                <a class="button button--small" href="{{ project.external_url }}" target="_blank" rel="noopener noreferrer">Visitar projeto <span aria-hidden="true">↗</span></a>
+                {% endif %}
+            </aside>
+            <div class="project-story-copy">
+                <section data-reveal>
+                    <p class="detail-label">O desafio</p>
+                    <div class="rich-text">{{ project.challenge|linebreaks }}</div>
+                </section>
+                <section data-reveal>
+                    <p class="detail-label">A solução</p>
+                    <div class="rich-text">{{ project.solution|linebreaks }}</div>
+                </section>
+            </div>
+        </div>
+    </section>
+
+    <section class="project-next">
+        <div class="container project-next-inner" data-reveal>
+            <p>{{ project.front.title }} na Prisma</p>
+            <h2>Tem um desafio parecido? Vamos colocar uma nova perspectiva em movimento.</h2>
+            <a class="button" href="{% url 'portfolio:home' %}#contato">Conversar sobre um projeto <span aria-hidden="true">↗</span></a>
+        </div>
+    </section>
+</article>
+{% endblock %}

@@ -1,0 +1,130 @@
+{% extends "portfolio/panel/base.html" %}
+
+{% block title %}Cases — Painel Prisma{% endblock %}
+
+{% block panel_content %}
+<div class="panel-page">
+    <header class="panel-page-header">
+        <div>
+            <p class="panel-kicker">Portfólio Prisma</p>
+            <h1>Cases</h1>
+            <p>Acompanhe rascunhos e publicações das frentes de Marketing e Tecnologia.</p>
+        </div>
+        {% if can_add_project %}
+        <a class="button" href="{% url 'portfolio:panel_project_create' %}">Novo case <span aria-hidden="true">+</span></a>
+        {% endif %}
+    </header>
+
+    <section class="panel-metrics" aria-label="Resumo dos cases">
+        <article class="panel-metric panel-metric--total">
+            <span class="panel-metric__label">Total de cases</span>
+            <strong>{{ status_counts.total }}</strong>
+            <span class="panel-metric__detail">Em todas as frentes</span>
+        </article>
+        <article class="panel-metric panel-metric--published">
+            <span class="panel-metric__mark" aria-hidden="true"></span>
+            <span class="panel-metric__label">Publicados</span>
+            <strong>{{ status_counts.published }}</strong>
+        </article>
+        <article class="panel-metric panel-metric--draft">
+            <span class="panel-metric__mark" aria-hidden="true"></span>
+            <span class="panel-metric__label">Rascunhos</span>
+            <strong>{{ status_counts.draft }}</strong>
+        </article>
+        {% for front_option in front_counts %}
+        <article class="panel-metric panel-metric--{{ front_option.slug }}">
+            <span class="panel-metric__index" aria-hidden="true">{{ forloop.counter|stringformat:"02d" }}</span>
+            <span class="panel-metric__label">{{ front_option.title }}</span>
+            <strong>{{ front_option.total_cases }}</strong>
+        </article>
+        {% endfor %}
+    </section>
+
+    <section class="panel-collection" aria-labelledby="project-list-title">
+        <div class="panel-collection__heading">
+            <div>
+                <p class="panel-kicker">Biblioteca</p>
+                <h2 id="project-list-title">Todos os cases</h2>
+            </div>
+            <p>{{ status_counts.total }} registro{{ status_counts.total|pluralize }}</p>
+        </div>
+
+        <form class="panel-filters" method="get" role="search">
+            <div class="panel-filter panel-filter--search">
+                <label for="panel-search">Buscar cases</label>
+                <span aria-hidden="true"></span>
+                <input id="panel-search" type="search" name="q" value="{{ filters.q }}" placeholder="Título, categoria ou resumo" autocomplete="off">
+            </div>
+            <div class="panel-filter">
+                <label for="panel-front">Frente</label>
+                <select id="panel-front" name="front">
+                    <option value="">Todas as frentes</option>
+                    {% for front_option in fronts %}
+                    <option value="{{ front_option.slug }}"{% if filters.front == front_option.slug %} selected{% endif %}>{{ front_option.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="panel-filter">
+                <label for="panel-status">Status</label>
+                <select id="panel-status" name="status">
+                    <option value="">Todos os status</option>
+                    {% for value, label in status_choices %}
+                    <option value="{{ value }}"{% if filters.status == value %} selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button class="panel-filter-submit" type="submit">Filtrar</button>
+            {% if filters.q or filters.front or filters.status %}
+            <a class="panel-filter-clear" href="{% url 'portfolio:panel_dashboard' %}">Limpar filtros</a>
+            {% endif %}
+        </form>
+
+        {% if projects %}
+        <div class="panel-project-list" role="list">
+            {% for project in projects %}
+            <article class="panel-project" role="listitem">
+                <div class="panel-project__visual">
+                    {% if project.image %}
+                    <img src="{{ project.image.url }}" alt="{{ project.image_alt }}" loading="lazy" width="320" height="200">
+                    {% else %}
+                    <div class="panel-project__art" aria-hidden="true"><span></span><i></i></div>
+                    {% endif %}
+                </div>
+                <div class="panel-project__body">
+                    <div class="panel-project__badges">
+                        <span class="panel-badge panel-badge--front">{{ project.front.title }}</span>
+                        <span class="panel-badge panel-badge--{{ project.status }}"><i aria-hidden="true"></i>{{ project.get_status_display }}</span>
+                    </div>
+                    <h3>{{ project.title }}</h3>
+                    <p>{{ project.summary }}</p>
+                    <div class="panel-project__meta">
+                        <span>{{ project.category }}</span>
+                        <span>Atualizado em {{ project.updated_at|date:"d/m/Y" }}</span>
+                    </div>
+                </div>
+                <div class="panel-project__actions">
+                    {% if can_change_project %}
+                    <a class="panel-action panel-action--primary" href="{% url 'portfolio:panel_project_update' pk=project.pk %}">Editar <span aria-hidden="true">→</span></a>
+                    {% endif %}
+                    {% if project.status == 'published' %}
+                    <a class="panel-action" href="{{ project.get_absolute_url }}" target="_blank" rel="noopener noreferrer">Ver publicado <span aria-hidden="true">↗</span></a>
+                    {% endif %}
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="panel-empty-state">
+            <div class="panel-empty-state__art" aria-hidden="true"><span></span><i></i></div>
+            <p class="panel-kicker">Nenhum resultado</p>
+            <h3>Não encontramos cases com estes filtros.</h3>
+            <p>Ajuste a busca ou prepare um novo case para uma das frentes da Prisma.</p>
+            <div class="panel-empty-state__actions">
+                {% if filters.q or filters.front or filters.status %}<a class="text-link" href="{% url 'portfolio:panel_dashboard' %}">Limpar filtros</a>{% endif %}
+                {% if can_add_project %}<a class="button button--small" href="{% url 'portfolio:panel_project_create' %}">Criar case <span aria-hidden="true">+</span></a>{% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

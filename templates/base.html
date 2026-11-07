@@ -1,0 +1,135 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-BR" data-theme="{{ selected_theme.key }}" data-theme-explicit="{{ theme_explicit|yesno:'true,false' }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{% block meta_description %}{{ site_content.meta_description }}{% endblock %}">
+    <meta name="theme-color" content="{{ selected_theme.theme_color }}" id="theme-color-meta">
+    <meta name="color-scheme" content="dark light">
+    <meta property="og:locale" content="pt_BR">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Prisma">
+    <meta property="og:title" content="{% block og_title %}Prisma — A luz que transforma{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{{ site_content.meta_description }}{% endblock %}">
+    <link rel="canonical" href="{{ canonical_url }}">
+    <link rel="icon" href="{% static 'portfolio/img/favicon.svg' %}" type="image/svg+xml">
+    <title>{% block title %}{{ site_content.meta_title }}{% endblock %}</title>
+    <script>
+        (() => {
+            const root = document.documentElement;
+            root.classList.add("js");
+            if (root.dataset.themeExplicit === "true") return;
+            try {
+                const stored = localStorage.getItem("prisma-theme");
+                if (stored === "golden" || stored === "solar") root.dataset.theme = stored;
+            } catch (error) {
+                // O tema do servidor continua funcionando quando o armazenamento está indisponível.
+            }
+        })();
+    </script>
+    <link rel="stylesheet" href="{% static 'portfolio/css/site.css' %}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body data-page="{{ page_kind|default:'page' }}">
+    <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
+    <header class="site-header" data-site-header>
+        <div class="container header-inner">
+            <a class="brand" href="{% url 'portfolio:home' %}" aria-label="Prisma — página inicial">
+                <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true">
+                    <path class="brand-mark-outline" d="M20 3 36.5 32H3.5L20 3Z"/>
+                    <path class="brand-mark-face" d="M20 3v29H3.5L20 3Z"/>
+                    <path class="brand-mark-ray" d="M21 19.5h17"/>
+                </svg>
+                <span class="brand-word">PRISMA</span>
+            </a>
+
+            <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav" data-nav-toggle>
+                <span class="visually-hidden">Abrir menu</span>
+                <span></span><span></span>
+            </button>
+
+            <nav class="primary-nav" id="primary-nav" aria-label="Navegação principal" data-nav>
+                {% for nav_front in nav_fronts %}
+                <a href="{{ nav_front.get_absolute_url }}"{% if active_front_slug == nav_front.slug %} aria-current="page"{% endif %}>{{ nav_front.title }}</a>
+                {% endfor %}
+                <a href="{% if page_kind == 'home' %}#portfolio{% elif page_kind == 'front' %}#cases{% else %}{% url 'portfolio:home' %}#portfolio{% endif %}">Cases</a>
+                <a href="{% if page_kind == 'home' %}#processo{% else %}{% url 'portfolio:home' %}#processo{% endif %}">Como trabalhamos</a>
+            </nav>
+
+            <div class="header-actions">
+                <div class="theme-switcher" role="group" aria-label="Escolher versão visual">
+                    {% for theme in themes %}
+                    <button
+                        type="button"
+                        class="theme-choice"
+                        data-theme-choice="{{ theme.key }}"
+                        data-theme-slug="{{ theme.slug }}"
+                        data-theme-color="{{ theme.theme_color }}"
+                        data-theme-url="{% url 'portfolio:theme' theme.slug %}"
+                        aria-pressed="{% if selected_theme.key == theme.key %}true{% else %}false{% endif %}"
+                        title="Tema {{ theme.label }}"
+                    >
+                        <span class="theme-swatch theme-swatch--{{ theme.key }}" aria-hidden="true"></span>
+                        <span class="theme-choice-label">{{ theme.short_label }}</span>
+                    </button>
+                    {% endfor %}
+                    <span class="visually-hidden" aria-live="polite" data-theme-status></span>
+                </div>
+                <a class="button button--small header-cta" href="{% if page_kind == 'home' %}#contato{% else %}{% url 'portfolio:home' %}#contato{% endif %}">Fale com a Prisma</a>
+            </div>
+        </div>
+    </header>
+
+    {% if messages %}
+    <div class="message-stack container" aria-live="polite" aria-atomic="true">
+        {% for message in messages %}
+        <div class="message message--{{ message.tags|default:'info' }}">
+            <span>{{ message }}</span>
+            <button type="button" aria-label="Fechar aviso" data-dismiss-message>×</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <main id="conteudo">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-grid">
+            <div class="footer-brand">
+                <a class="brand" href="{% url 'portfolio:home' %}" aria-label="Prisma — página inicial">
+                    <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true">
+                        <path class="brand-mark-outline" d="M20 3 36.5 32H3.5L20 3Z"/>
+                        <path class="brand-mark-face" d="M20 3v29H3.5L20 3Z"/>
+                        <path class="brand-mark-ray" d="M21 19.5h17"/>
+                    </svg>
+                    <span class="brand-word">PRISMA</span>
+                </a>
+                <p>{{ site_content.footer_summary }}</p>
+            </div>
+            <div class="footer-links">
+                <p class="footer-label">Frentes</p>
+                {% for nav_front in nav_fronts %}<a href="{{ nav_front.get_absolute_url }}">{{ nav_front.title }}</a>{% endfor %}
+                <a href="{% url 'portfolio:home' %}#portfolio">Cases</a>
+                <a href="{% url 'portfolio:home' %}#contato">Contato</a>
+            </div>
+            <div class="footer-links">
+                <p class="footer-label">Sistema</p>
+                <a href="{% url 'portfolio:panel_dashboard' %}">Área administrativa</a>
+                <span>Política de privacidade a definir</span>
+                <span>Dados legais a definir</span>
+            </div>
+        </div>
+        <div class="container footer-bottom">
+            <p>© {% now "Y" %} Prisma. Identidade e informações comerciais em definição.</p>
+            <a href="#conteudo">Voltar ao topo <span aria-hidden="true">↑</span></a>
+        </div>
+    </footer>
+
+    <script src="{% static 'portfolio/js/site.js' %}" defer></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

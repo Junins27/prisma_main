@@ -1,0 +1,93 @@
+.prisma-admin-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(20rem, 1.45fr);
+    gap: 2rem;
+    margin: 0 0 2rem;
+    padding: clamp(1.5rem, 4vw, 2.75rem);
+    border: 1px solid var(--hairline-color);
+    border-radius: .75rem;
+    background: linear-gradient(135deg, #20242a, #30343a);
+    color: #fff6e0;
+}
+
+.prisma-admin-hero h1 {
+    max-width: 18ch;
+    margin: .35rem 0 .75rem;
+    color: #fff6e0;
+    font-size: clamp(1.75rem, 3vw, 2.8rem);
+    line-height: 1.05;
+}
+
+.prisma-admin-hero p {
+    max-width: 58ch;
+    margin: 0;
+    color: #d9d9d6;
+    line-height: 1.6;
+}
+
+.prisma-admin-kicker {
+    color: #f6c945 !important;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+}
+
+.prisma-admin-shortcuts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .75rem;
+}
+
+.prisma-admin-shortcuts a {
+    display: flex;
+    min-height: 8.5rem;
+    flex-direction: column;
+    padding: 1rem;
+    border: 1px solid rgba(255, 246, 224, .18);
+    border-radius: .55rem;
+    background: rgba(255, 255, 255, .05);
+    color: #fff6e0;
+    text-decoration: none;
+    transition: border-color .2s ease, transform .2s ease;
+}
+
+.prisma-admin-shortcuts a:hover,
+.prisma-admin-shortcuts a:focus-visible {
+    border-color: #f6c945;
+    color: #fff6e0;
+    transform: translateY(-2px);
+}
+
+.prisma-admin-shortcuts span {
+    margin-bottom: auto;
+    color: #f6c945;
+    font-size: .72rem;
+    font-weight: 700;
+}
+
+.prisma-admin-shortcuts strong {
+    margin: 1rem 0 .3rem;
+    font-size: 1rem;
+}
+
+.prisma-admin-shortcuts small {
+    color: #d9d9d6;
+    line-height: 1.4;
+}
+
+@media (max-width: 900px) {
+    .prisma-admin-hero {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .prisma-admin-shortcuts {
+        grid-template-columns: 1fr;
+    }
+
+    .prisma-admin-shortcuts a {
+        min-height: 7rem;
+    }
+}
