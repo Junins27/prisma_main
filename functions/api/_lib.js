@@ -2,6 +2,11 @@ const encoder = new TextEncoder();
 const json = (data, status = 200) => new Response(JSON.stringify(data), {status, headers: {"Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store"}});
 const base64url = (bytes) => btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
 const decode64url = (value) => Uint8Array.from(atob(value.replace(/-/g, "+").replace(/_/g, "/")), (char) => char.charCodeAt(0));
+const defaultContact = {email: "", phone: "", whatsapp: "", availability: "", location: "", instagram_url: "", linkedin_url: ""};
+
+export function normaliseState(state = {}) {
+  return {cases: Array.isArray(state.cases) ? state.cases : [], contact: {...defaultContact, ...(state.contact || {})}};
+}
 
 export function database(env) {
   if (!env.PRISMA_DB) throw new Error("O binding PRISMA_DB não está configurado.");
@@ -16,11 +21,11 @@ export async function initialise(env) {
   ]);
   const stored = await db.prepare("SELECT payload FROM prisma_state WHERE id = 1").first();
   if (!stored) {
-    const state = JSON.stringify({cases: []});
+    const state = JSON.stringify(normaliseState());
     await db.prepare("INSERT INTO prisma_state (id, payload, updated_at) VALUES (1, ?, ?)").bind(state, new Date().toISOString()).run();
-    return {cases: []};
+    return normaliseState();
   }
-  try { return JSON.parse(stored.payload); } catch (_) { return {cases: []}; }
+  try { return normaliseState(JSON.parse(stored.payload)); } catch (_) { return normaliseState(); }
 }
 
 export async function saveState(env, state) {

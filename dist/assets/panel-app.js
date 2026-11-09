@@ -19,6 +19,13 @@
   function controls() {
     document.querySelector("[data-logout]")?.addEventListener("click", () => { sessionStorage.removeItem(tokenKey); login(); });
     document.querySelectorAll("[data-theme-choice]").forEach((button) => button.addEventListener("click", () => { document.documentElement.dataset.theme = button.dataset.themeChoice; localStorage.setItem("prisma-theme", button.dataset.themeChoice); }));
+    const nav = document.querySelector(".panel-nav");
+    if (nav && !nav.querySelector("[data-show-contact]")) {
+      const button = document.createElement("button");
+      button.type = "button"; button.className = "panel-nav-action"; button.dataset.showContact = "";
+      button.innerHTML = "<span><strong>Dados de contato</strong><small>Canais públicos da Prisma</small></span>";
+      nav.append(button); button.addEventListener("click", contacts);
+    }
   }
   function drawMedia(grid, images, refresh) {
     grid.innerHTML = images.length ? images.map((image, index) => `<figure class="panel-media-card"><img src="${esc(image.preview || image.url)}" alt=""><figcaption><span>Imagem ${index + 1}</span><button type="button" data-remove-image="${index}">Remover</button></figcaption></figure>`).join("") : '<p class="panel-media-empty">Nenhuma imagem adicionada. A galeria é opcional.</p>';
@@ -31,6 +38,19 @@
       root.innerHTML = shell(`<main class="panel-page"><header class="panel-page-header"><div><p class="panel-kicker">Painel editorial</p><h1>Cases em movimento.</h1><p>Administre os trabalhos de Marketing e Tecnologia.</p></div><button class="button" data-new-case>Novo case <span>↗</span></button></header><section class="panel-collection"><header class="panel-collection__heading"><div><p class="panel-kicker">Biblioteca</p><h2>Cases cadastrados</h2></div><p>${cases.length} item(ns).</p></header><div class="panel-project-list">${cards}</div></section></main>`);
       controls(); document.querySelector("[data-new-case]")?.addEventListener("click", () => form());
       document.querySelectorAll("[data-edit]").forEach((button) => button.addEventListener("click", () => form(cases.find((item) => item.slug === button.dataset.edit))));
+    } catch (error) { sessionStorage.removeItem(tokenKey); login(error.message); }
+  }
+  async function contacts() {
+    try {
+      const {contact = {}} = await api("/api/settings");
+      root.innerHTML = shell(`<main class="panel-page"><header class="panel-page-header panel-editor-header"><div><button class="panel-back-link" type="button" data-back-to-cases>← Voltar para cases</button><p class="panel-kicker">Dados institucionais</p><h1>Canais de contato.</h1><p>Essas informações aparecem na seção de contato da página inicial.</p></div></header><form data-contact-settings><div class="panel-editor"><div><section class="panel-form-section"><header class="panel-form-section__header"><span>01</span><div><h2>Contato direto</h2><p>Inclua apenas os canais que podem ser publicados.</p></div></header><div class="panel-form-grid"><div class="panel-field"><label for="contact_email">E-mail</label><input class="panel-control" id="contact_email" name="email" type="email" value="${esc(contact.email)}" placeholder="contato@empresa.com.br"></div><div class="panel-field"><label for="contact_phone">Telefone</label><input class="panel-control" id="contact_phone" name="phone" value="${esc(contact.phone)}" placeholder="(00) 0000-0000"></div><div class="panel-field panel-field--full"><label for="contact_whatsapp">WhatsApp</label><input class="panel-control" id="contact_whatsapp" name="whatsapp" value="${esc(contact.whatsapp)}" placeholder="(00) 00000-0000"></div></div></section><section class="panel-form-section"><header class="panel-form-section__header"><span>02</span><div><h2>Atendimento e canais</h2><p>Detalhes que ajudam uma nova conversa a começar.</p></div></header><div class="panel-form-grid"><div class="panel-field"><label for="contact_availability">Disponibilidade</label><input class="panel-control" id="contact_availability" name="availability" value="${esc(contact.availability)}" placeholder="Segunda a sexta, das 9h às 18h"></div><div class="panel-field"><label for="contact_location">Localização</label><input class="panel-control" id="contact_location" name="location" value="${esc(contact.location)}" placeholder="Brasil · atendimento remoto"></div><div class="panel-field"><label for="contact_instagram">Instagram</label><input class="panel-control" id="contact_instagram" name="instagram_url" type="url" value="${esc(contact.instagram_url)}" placeholder="https://instagram.com/... "></div><div class="panel-field"><label for="contact_linkedin">LinkedIn</label><input class="panel-control" id="contact_linkedin" name="linkedin_url" type="url" value="${esc(contact.linkedin_url)}" placeholder="https://linkedin.com/company/... "></div></div></section><p class="panel-form-alert" hidden data-form-error></p><div class="panel-form-actions"><button class="panel-cancel" type="button" data-back-to-cases>Cancelar</button><button class="button" type="submit">Salvar dados <span>↗</span></button></div></div><aside class="panel-editor__summary"><div class="panel-editor-summary-card"><span class="panel-summary-front">Publicação</span><h2>Contato da Prisma</h2><p class="panel-editor-summary-card__note">Os campos preenchidos substituem os textos provisórios da página inicial.</p></div></aside></div></form></main>`);
+      controls();
+      root.querySelectorAll("[data-back-to-cases]").forEach((button) => button.addEventListener("click", dashboard));
+      root.querySelector("[data-contact-settings]").addEventListener("submit", async (event) => {
+        event.preventDefault(); const form = event.currentTarget, error = form.querySelector("[data-form-error]"); error.hidden = true;
+        try { await api("/api/settings", {method: "PUT", body: JSON.stringify(Object.fromEntries(new FormData(form)))}); dashboard(); }
+        catch (reason) { error.textContent = reason.message; error.hidden = false; }
+      });
     } catch (error) { sessionStorage.removeItem(tokenKey); login(error.message); }
   }
   function form(item = {}) {

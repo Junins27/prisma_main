@@ -23,7 +23,19 @@
       container.innerHTML = filtered.length ? filtered.map(card).join("") : (front ? placeholder(seed.fronts.find((item) => item.slug === front)) : seed.fronts.map(placeholder).join(""));
       reveal(container);
     });
+    applyContact(state.contact);
     return {state, cases};
+  }
+  function applyContact(contact = {}) {
+    if (!contact.email && !contact.phone && !contact.whatsapp && !contact.availability && !contact.location && !contact.instagram_url && !contact.linkedin_url) return;
+    const target = document.querySelector(".contact-copy");
+    if (!target) return;
+    target.querySelectorAll(".contact-detail").forEach((element) => element.remove());
+    const direct = [contact.email ? `<a href="mailto:${escape(contact.email)}">${escape(contact.email)}</a>` : "", contact.phone ? escape(contact.phone) : "", contact.whatsapp ? escape(contact.whatsapp) : ""].filter(Boolean).join("<br>");
+    const availability = [contact.availability ? escape(contact.availability) : "", contact.location ? escape(contact.location) : ""].filter(Boolean).join("<br>");
+    const social = [contact.instagram_url ? `<a href="${escape(contact.instagram_url)}" target="_blank" rel="noopener">Instagram</a>` : "", contact.linkedin_url ? `<a href="${escape(contact.linkedin_url)}" target="_blank" rel="noopener">LinkedIn</a>` : ""].filter(Boolean).join(" · ");
+    const blocks = [direct ? `<div class="contact-detail"><span>01</span><p><strong>Contato direto</strong><br>${direct}</p></div>` : "", availability ? `<div class="contact-detail"><span>02</span><p><strong>Atendimento</strong><br>${availability}</p></div>` : "", social ? `<div class="contact-detail"><span>03</span><p><strong>Canais</strong><br>${social}</p></div>` : ""].join("");
+    target.insertAdjacentHTML("beforeend", blocks);
   }
   function setCaseDetail(cases) {
     const target = document.querySelector("[data-case-detail]");
