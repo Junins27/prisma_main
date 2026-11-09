@@ -3,12 +3,16 @@ import {failure, initialise, isAuthorised, json, saveState} from "./_lib.js";
 const clean = (value, length) => typeof value === "string" ? value.trim().slice(0, length) : "";
 const slugify = (value) => clean(value, 120).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 120) || "case";
 const mediaUrl = (key) => `/api/media/${key.split("/").map(encodeURIComponent).join("/")}`;
+const numberInRange = (value, fallback, min, max) => {
+  const number = Number(value);
+  return Number.isFinite(number) ? Math.min(max, Math.max(min, Math.round(number))) : fallback;
+};
 const normaliseImages = (images) => {
   if (!Array.isArray(images)) return [];
   return images.slice(0, 5).map((image) => {
     const key = clean(image?.key, 300);
     if (!key || !/^cases\/[a-z0-9-]+\.(?:avif|jpe?g|png|webp)$/i.test(key)) return null;
-    return {key, url: mediaUrl(key), alt: clean(image?.alt, 180)};
+    return {key, url: mediaUrl(key), alt: clean(image?.alt, 180), fit: image?.fit === "cover" ? "cover" : "contain", position_x: numberInRange(image?.position_x, 50, 0, 100), position_y: numberInRange(image?.position_y, 50, 0, 100), zoom: numberInRange(image?.zoom, 100, 100, 200)};
   }).filter(Boolean);
 };
 const normalise = (source, existing = {}) => {

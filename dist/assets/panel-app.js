@@ -27,9 +27,15 @@
       nav.append(button); button.addEventListener("click", contacts);
     }
   }
+  const frameStyle = (image) => `object-fit:${image.fit === "cover" ? "cover" : "contain"};object-position:${Number(image.position_x ?? 50)}% ${Number(image.position_y ?? 50)}%;transform-origin:${Number(image.position_x ?? 50)}% ${Number(image.position_y ?? 50)}%;transform:scale(${Number(image.zoom ?? 100) / 100})`;
   function drawMedia(grid, images, refresh) {
-    grid.innerHTML = images.length ? images.map((image, index) => `<figure class="panel-media-card"><img src="${esc(image.preview || image.url)}" alt=""><figcaption><span>Imagem ${index + 1}</span><button type="button" data-remove-image="${index}">Remover</button></figcaption></figure>`).join("") : '<p class="panel-media-empty">Nenhuma imagem adicionada. A galeria é opcional.</p>';
+    grid.innerHTML = images.length ? images.map((image, index) => `<figure class="panel-media-card" data-image-card="${index}"><div class="panel-media-card__preview"><img src="${esc(image.preview || image.url)}" alt="" style="${frameStyle(image)}"></div><figcaption><span>Imagem ${index + 1}</span><button type="button" data-remove-image="${index}">Remover</button></figcaption><div class="panel-image-controls"><label>Exibição<select data-image-fit="${index}"><option value="contain" ${image.fit !== "cover" ? "selected" : ""}>Mostrar inteira</option><option value="cover" ${image.fit === "cover" ? "selected" : ""}>Preencher espaço</option></select></label><label>Zoom <output data-image-zoom-output="${index}">${image.zoom || 100}%</output><input type="range" min="100" max="200" value="${image.zoom || 100}" data-image-zoom="${index}"></label><div class="panel-image-controls__position"><label>Horizontal<input type="range" min="0" max="100" value="${image.position_x ?? 50}" data-image-x="${index}"></label><label>Vertical<input type="range" min="0" max="100" value="${image.position_y ?? 50}" data-image-y="${index}"></label></div><p>Use “Mostrar inteira” para evitar cortes. Em “Preencher espaço”, ajuste o foco e o zoom.</p></div></figure>`).join("") : '<p class="panel-media-empty">Nenhuma imagem adicionada. A galeria é opcional.</p>';
+    const updateCard = (index) => { const image = images[index], card = grid.querySelector(`[data-image-card="${index}"]`); if (!card) return; card.querySelector("img").style.cssText = frameStyle(image); card.querySelector(`[data-image-zoom-output="${index}"]`).textContent = `${image.zoom}%`; };
     grid.querySelectorAll("[data-remove-image]").forEach((button) => button.addEventListener("click", () => { images.splice(Number(button.dataset.removeImage), 1); refresh(); }));
+    grid.querySelectorAll("[data-image-fit]").forEach((field) => field.addEventListener("change", () => { const index = Number(field.dataset.imageFit); images[index].fit = field.value; updateCard(index); }));
+    grid.querySelectorAll("[data-image-zoom]").forEach((field) => field.addEventListener("input", () => { const index = Number(field.dataset.imageZoom); images[index].zoom = Number(field.value); updateCard(index); }));
+    grid.querySelectorAll("[data-image-x]").forEach((field) => field.addEventListener("input", () => { const index = Number(field.dataset.imageX); images[index].position_x = Number(field.value); updateCard(index); }));
+    grid.querySelectorAll("[data-image-y]").forEach((field) => field.addEventListener("input", () => { const index = Number(field.dataset.imageY); images[index].position_y = Number(field.value); updateCard(index); }));
   }
   async function dashboard() {
     try {
@@ -61,7 +67,7 @@
     editor.querySelector("#id_images").addEventListener("change", (event) => {
       const files = [...event.target.files];
       if (images.length + files.length > 5) { alert("Cada case pode ter no máximo cinco imagens."); event.target.value = ""; return; }
-      files.forEach((file) => images.push({file, preview: URL.createObjectURL(file)})); event.target.value = ""; updateMedia();
+      files.forEach((file) => images.push({file, preview: URL.createObjectURL(file), fit: "contain", position_x: 50, position_y: 50, zoom: 100})); event.target.value = ""; updateMedia();
     });
     const sync = () => { editor.querySelector("[data-summary-title]").textContent = editor.title.value.trim() || "Case sem título"; editor.querySelector("[data-summary-front]").textContent = editor.front.selectedOptions[0]?.text || "Frente do case"; editor.querySelector("[data-summary-status]").textContent = editor.status.selectedOptions[0]?.text || "Rascunho"; };
     editor.addEventListener("input", sync); editor.addEventListener("change", sync); sync();
@@ -70,7 +76,7 @@
       event.preventDefault(); const message = editor.querySelector("[data-form-error]"), submit = editor.querySelector("button[type=submit]"); message.hidden = true; submit.disabled = true;
       try {
         for (const image of images.filter((entry) => entry.file)) { const upload = new FormData(); upload.append("image", image.file); const {image: saved} = await api("/api/media", {method: "POST", body: upload}); Object.assign(image, saved); delete image.file; delete image.preview; }
-        const data = Object.fromEntries(new FormData(editor)); data.featured = editor.featured.checked; data.images = images.map(({key, url, alt}) => ({key, url, alt}));
+        const data = Object.fromEntries(new FormData(editor)); data.featured = editor.featured.checked; data.images = images.map(({key, url, alt, fit, position_x, position_y, zoom}) => ({key, url, alt, fit, position_x, position_y, zoom}));
         if (item.slug) data.slug = item.slug;
         await api("/api/cases", {method: item.slug ? "PUT" : "POST", body: JSON.stringify(data)}); dashboard();
       } catch (error) { message.textContent = error.message; message.hidden = false; submit.disabled = false; }

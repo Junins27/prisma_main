@@ -35,7 +35,7 @@ As páginas públicas funcionam sem configuração adicional. Para que o painel 
    - `ADMIN_SESSION_SECRET`: texto aleatório, longo e exclusivo para assinar as sessões.
 5. Faça um novo deploy. As tabelas de cases e contatos são criadas automaticamente no primeiro acesso.
 
-O painel fica em `/painel/`. Cada case aceita até cinco imagens (JPG, PNG, WebP ou AVIF), de até 8 MB por arquivo. Elas são armazenadas no R2 e exibidas como uma galeria com rolagem. O menu **Dados de contato** permite publicar e atualizar e-mail, telefone, WhatsApp, disponibilidade, localização, Instagram e LinkedIn na página inicial. As credenciais nunca são colocadas no repositório: elas ficam exclusivamente nos Secrets do Cloudflare.
+O painel fica em `/painel/`. Cada case aceita até cinco imagens (JPG, PNG, WebP ou AVIF), de até 8 MB por arquivo. Elas são armazenadas no R2 e exibidas como uma galeria com rolagem. Para cada imagem, o editor permite mostrar a imagem inteira ou preencher o quadro, além de ajustar zoom e ponto focal horizontal/vertical sem alterar o arquivo original. O menu **Dados de contato** permite publicar e atualizar e-mail, telefone, WhatsApp, disponibilidade, localização, Instagram e LinkedIn na página inicial. As credenciais nunca são colocadas no repositório: elas ficam exclusivamente nos Secrets do Cloudflare.
 
 ## Rotas públicas
 
