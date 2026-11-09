@@ -2,6 +2,15 @@ import {failure, initialise, isAuthorised, json, saveState} from "./_lib.js";
 
 const clean = (value, length) => typeof value === "string" ? value.trim().slice(0, length) : "";
 const slugify = (value) => clean(value, 120).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 120) || "case";
+const mediaUrl = (key) => `/api/media/${key.split("/").map(encodeURIComponent).join("/")}`;
+const normaliseImages = (images) => {
+  if (!Array.isArray(images)) return [];
+  return images.slice(0, 5).map((image) => {
+    const key = clean(image?.key, 300);
+    if (!key || !/^cases\/[a-z0-9-]+\.(?:avif|jpe?g|png|webp)$/i.test(key)) return null;
+    return {key, url: mediaUrl(key), alt: clean(image?.alt, 180)};
+  }).filter(Boolean);
+};
 const normalise = (source, existing = {}) => {
   const item = {
     ...existing,
@@ -9,7 +18,7 @@ const normalise = (source, existing = {}) => {
     title: clean(source.title, 120), category: clean(source.category, 80), summary: clean(source.summary, 240),
     challenge: clean(source.challenge, 5000), solution: clean(source.solution, 5000), deliverables: clean(source.deliverables, 220),
     external_url: clean(source.external_url, 500), status: source.status === "published" ? "published" : "draft",
-    featured: Boolean(source.featured), updated_at: new Date().toISOString()
+    featured: Boolean(source.featured), images: normaliseImages(source.images), updated_at: new Date().toISOString()
   };
   if (!item.front || !item.title || !item.category || !item.summary || !item.challenge || !item.solution || !item.deliverables) throw new Error("Preencha todos os campos obrigatórios do case.");
   if (item.external_url && !/^https:\/\//i.test(item.external_url)) throw new Error("O link externo precisa começar com https://.");

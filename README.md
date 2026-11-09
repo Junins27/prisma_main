@@ -23,18 +23,19 @@ O arquivo `dist/index.html` é entregue diretamente, eliminando o erro de diret�
 
 Este repositório também declara `wrangler.jsonc`, com `assets.directory` apontando para `./dist`. Portanto, se o projeto tiver sido criado no modo **Workers** (em vez de Pages), o deploy automático também reconhece os arquivos estáticos e mantém a API no mesmo Worker.
 
-### Ativar painel, cases e formulário de contato
+### Ativar painel, cases, galeria e formulário de contato
 
 As páginas públicas funcionam sem configuração adicional. Para que o painel e o formulário gravem dados de forma persistente:
 
 1. No Cloudflare, crie um banco D1, por exemplo `prisma-production`.
 2. Em **Workers & Pages > seu projeto > Settings > Bindings**, adicione esse banco com o nome da variável `PRISMA_DB`.
-3. Em **Settings > Variables and Secrets**, crie os segredos de produção e preview:
+3. Crie um bucket **R2** (por exemplo, `prisma-media`) e, em **Settings > Bindings**, vincule-o como **R2 bucket** com o nome da variável `PRISMA_MEDIA`.
+4. Em **Settings > Variables and Secrets**, crie os segredos de produção e preview:
    - `ADMIN_PASSWORD`: senha da equipe editorial;
    - `ADMIN_SESSION_SECRET`: texto aleatório, longo e exclusivo para assinar as sessões.
-4. Faça um novo deploy. As tabelas de cases e contatos são criadas automaticamente no primeiro acesso.
+5. Faça um novo deploy. As tabelas de cases e contatos são criadas automaticamente no primeiro acesso.
 
-O painel fica em `/painel/`. As credenciais nunca são colocadas no repositório: elas ficam exclusivamente nos Secrets do Cloudflare.
+O painel fica em `/painel/`. Cada case aceita até cinco imagens (JPG, PNG, WebP ou AVIF), de até 8 MB por arquivo. Elas são armazenadas no R2 e exibidas como uma galeria com rolagem. As credenciais nunca são colocadas no repositório: elas ficam exclusivamente nos Secrets do Cloudflare.
 
 ## Rotas públicas
 
