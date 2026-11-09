@@ -27,15 +27,22 @@
     return {state, cases};
   }
   function applyContact(contact = {}) {
-    if (!contact.email && !contact.phone && !contact.whatsapp && !contact.availability && !contact.location && !contact.instagram_url && !contact.linkedin_url) return;
-    const target = document.querySelector(".contact-copy");
-    if (!target) return;
-    target.querySelectorAll(".contact-detail").forEach((element) => element.remove());
-    const direct = [contact.email ? `<a href="mailto:${escape(contact.email)}">${escape(contact.email)}</a>` : "", contact.phone ? escape(contact.phone) : "", contact.whatsapp ? escape(contact.whatsapp) : ""].filter(Boolean).join("<br>");
-    const availability = [contact.availability ? escape(contact.availability) : "", contact.location ? escape(contact.location) : ""].filter(Boolean).join("<br>");
-    const social = [contact.instagram_url ? `<a href="${escape(contact.instagram_url)}" target="_blank" rel="noopener">Instagram</a>` : "", contact.linkedin_url ? `<a href="${escape(contact.linkedin_url)}" target="_blank" rel="noopener">LinkedIn</a>` : ""].filter(Boolean).join(" · ");
-    const blocks = [direct ? `<div class="contact-detail"><span>01</span><p><strong>Contato direto</strong><br>${direct}</p></div>` : "", availability ? `<div class="contact-detail"><span>02</span><p><strong>Atendimento</strong><br>${availability}</p></div>` : "", social ? `<div class="contact-detail"><span>03</span><p><strong>Canais</strong><br>${social}</p></div>` : ""].join("");
-    target.insertAdjacentHTML("beforeend", blocks);
+    document.querySelector(".contact-copy")?.querySelectorAll(".contact-detail").forEach((element) => element.remove());
+    const footer = document.querySelector(".footer-grid");
+    footer?.querySelector("[data-footer-contact]")?.remove();
+    if (!footer || !contact.email && !contact.phone && !contact.whatsapp && !contact.availability && !contact.location && !contact.instagram_url && !contact.linkedin_url) return;
+    const icon = (name) => ({
+      email: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18v12H3zM3 7l9 6 9-6"/></svg>',
+      phone: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h4l2 5-2.5 1.7a15 15 0 0 0 4.8 4.8L16 12l5 2v4c-10 1-16-5-15-15Z"/></svg>',
+      whatsapp: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a8 8 0 0 1-11.8 7L4 20l1.5-4.2A8 8 0 1 1 20 11.5ZM9 8.2c.2 2 1.8 3.6 3.8 3.8l1-1.2 2 1c-1.2 2.2-5.5.8-7.2-1S5.3 4.8 7.5 3.7l1 2Z"/></svg>',
+      pin: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.1 7-12a7 7 0 1 0-14 0c0 5.9 7 12 7 12Zm0-9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z"/></svg>',
+      clock: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg>',
+      link: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 15 15 9M8 18H6a4 4 0 0 1 0-8h3m7 4h2a4 4 0 0 0 0-8h-3"/></svg>'
+    }[name]);
+    const item = (type, label, value, href = "") => `<${href ? "a" : "span"} class="footer-contact__item" ${href ? `href="${escape(href)}" ${href.startsWith("http") ? 'target="_blank" rel="noopener"' : ""}` : ""}><i class="footer-contact__icon">${icon(type)}</i><span><small>${label}</small><strong>${escape(value)}</strong></span></${href ? "a" : "span"}>`;
+    const whatsappDigits = String(contact.whatsapp || "").replace(/\D/g, "");
+    const rows = [contact.email ? item("email", "E-mail", contact.email, `mailto:${contact.email}`) : "", contact.phone ? item("phone", "Telefone", contact.phone, `tel:${contact.phone.replace(/\D/g, "")}`) : "", contact.whatsapp ? item("whatsapp", "WhatsApp", contact.whatsapp, whatsappDigits ? `https://wa.me/${whatsappDigits}` : "") : "", contact.availability ? item("clock", "Atendimento", contact.availability) : "", contact.location ? item("pin", "Localização", contact.location) : "", contact.instagram_url ? item("link", "Instagram", "Acessar perfil", contact.instagram_url) : "", contact.linkedin_url ? item("link", "LinkedIn", "Acessar perfil", contact.linkedin_url) : ""].filter(Boolean).join("");
+    footer.insertAdjacentHTML("beforeend", `<div class="footer-links footer-contact" data-footer-contact><p class="footer-label">Contato</p>${rows}</div>`);
   }
   function setCaseDetail(cases) {
     const target = document.querySelector("[data-case-detail]");

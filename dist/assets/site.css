@@ -1817,6 +1817,7 @@ html[data-theme="solar"] .consent label { color: var(--text); }
 }
 
 .footer-links a:hover { color: var(--interactive); text-decoration-color: var(--accent); }
+.footer-contact { gap: .7rem; }.footer-contact__item { display: grid; grid-template-columns: 1.65rem minmax(0, 1fr); align-items: center; gap: .55rem; color: var(--muted); text-decoration: none; }.footer-contact__item:hover { color: var(--interactive); }.footer-contact__item > span { min-width: 0; }.footer-contact__item small, .footer-contact__item strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }.footer-contact__item small { color: var(--subtle); font-family: var(--font-mono); font-size: .58rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }.footer-contact__item strong { margin-top: .1rem; color: inherit; font-size: .73rem; font-weight: 650; }.footer-contact__icon { display: grid; width: 1.65rem; aspect-ratio: 1; place-items: center; border: 1px solid var(--border); border-radius: 50%; color: var(--accent); }.footer-contact__icon svg { width: .78rem; height: .78rem; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.7; }
 
 .footer-bottom {
     display: flex;
