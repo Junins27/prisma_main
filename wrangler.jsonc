@@ -2,7 +2,20 @@
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "prisma",
   "main": "./src/index.js",
-  "compatibility_date": "2026-11-07",
+  "compatibility_date": "2026-11-10",
+  "d1_databases": [
+    {
+      "binding": "PRISMA_DB",
+      "database_name": "prisma-db",
+      "database_id": "55eb5653-1165-4f6e-9ca4-138ea4787e2f"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "PRISMA_MEDIA",
+      "bucket_name": "prisma-media"
+    }
+  ],
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
