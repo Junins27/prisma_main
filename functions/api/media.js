@@ -16,7 +16,7 @@ export async function onRequest(context) {
     const requestedKey = keyFromRequest(request);
 
     if (request.method === "GET") {
-      if (!/^(cases|team)\//.test(requestedKey)) return json({error: "Imagem não encontrada."}, 404);
+      if (!/^(cases|team|partners)\//.test(requestedKey)) return json({error: "Imagem não encontrada."}, 404);
       const object = await env.PRISMA_MEDIA.get(requestedKey);
       if (!object) return json({error: "Imagem não encontrada."}, 404);
       return new Response(object.body, {headers: {
@@ -35,7 +35,8 @@ export async function onRequest(context) {
     if (!extensions[file.type]) throw new Error("Envie uma imagem JPG, PNG, WebP ou AVIF.");
     if (file.size > maxFilesize) throw new Error("Cada imagem pode ter no máximo 8 MB.");
 
-    const folder = form.get("scope") === "team" ? "team" : "cases";
+    const scope = form.get("scope");
+    const folder = scope === "team" ? "team" : scope === "partners" ? "partners" : "cases";
     const key = `${folder}/${crypto.randomUUID()}.${extensions[file.type]}`;
     await env.PRISMA_MEDIA.put(key, await file.arrayBuffer(), {httpMetadata: {contentType: file.type}});
     return json({image: {key, url: mediaUrl(key), alt: ""}}, 201);

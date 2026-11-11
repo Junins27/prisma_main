@@ -15,6 +15,10 @@ const normaliseImages = (images) => {
     return {key, url: mediaUrl(key), alt: clean(image?.alt, 180), fit: image?.fit === "cover" ? "cover" : "contain", position_x: numberInRange(image?.position_x, 50, 0, 100), position_y: numberInRange(image?.position_y, 50, 0, 100), zoom: numberInRange(image?.zoom, 100, 100, 200)};
   }).filter(Boolean);
 };
+const normaliseResults = (results) => {
+  if (!Array.isArray(results)) return [];
+  return results.slice(0, 4).map((result) => ({label: clean(result?.label, 80), value: clean(result?.value, 80), detail: clean(result?.detail, 180)})).filter((result) => result.label && result.value);
+};
 const normalise = (source, existing = {}) => {
   const item = {
     ...existing,
@@ -22,7 +26,7 @@ const normalise = (source, existing = {}) => {
     title: clean(source.title, 120), category: clean(source.category, 80), summary: clean(source.summary, 240),
     challenge: clean(source.challenge, 5000), solution: clean(source.solution, 5000), deliverables: clean(source.deliverables, 220),
     external_url: clean(source.external_url, 500), status: source.status === "published" ? "published" : "draft",
-    featured: Boolean(source.featured), images: normaliseImages(source.images), updated_at: new Date().toISOString()
+    featured: Boolean(source.featured), images: normaliseImages(source.images), results: normaliseResults(source.results), updated_at: new Date().toISOString()
   };
   if (!item.front || !item.title || !item.category || !item.summary || !item.challenge || !item.solution || !item.deliverables) throw new Error("Preencha todos os campos obrigatórios do case.");
   if (item.external_url && !/^https:\/\//i.test(item.external_url)) throw new Error("O link externo precisa começar com https://.");

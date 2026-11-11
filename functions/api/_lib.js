@@ -4,10 +4,11 @@ const base64url = (bytes) => btoa(String.fromCharCode(...bytes)).replace(/\+/g, 
 const decode64url = (value) => Uint8Array.from(atob(value.replace(/-/g, "+").replace(/_/g, "/")), (char) => char.charCodeAt(0));
 const defaultContact = {email: "", phone: "", whatsapp: "", availability: "", location: "", instagram_url: "", linkedin_url: ""};
 const defaultTeam = () => [1, 2, 3].map((position) => ({id: `member-${position}`, name: "", role: "", bio: "", photo: null}));
+const defaultContent = () => ({testimonials: [], partners: [], insights: []});
 
 export function normaliseState(state = {}) {
   const members = Array.isArray(state.team) ? state.team : [];
-  return {cases: Array.isArray(state.cases) ? state.cases : [], contact: {...defaultContact, ...(state.contact || {})}, team: defaultTeam().map((member, index) => ({...member, ...(members[index] || {}), id: member.id}))};
+  return {cases: Array.isArray(state.cases) ? state.cases : [], contact: {...defaultContact, ...(state.contact || {})}, team: defaultTeam().map((member, index) => ({...member, ...(members[index] || {}), id: member.id})), content: {...defaultContent(), ...(state.content || {})}};
 }
 
 export function database(env) {
