@@ -38,6 +38,12 @@
       button.innerHTML = "<span><strong>Conteúdos</strong><small>Provas, marcas e insights</small></span>";
       nav.append(button); button.addEventListener("click", contentEditor);
     }
+    if (nav && !nav.querySelector("[data-show-services]")) {
+      const button = document.createElement("button");
+      button.type = "button"; button.className = "panel-nav-action"; button.dataset.showServices = "";
+      button.innerHTML = "<span><strong>Serviços</strong><small>Catálogo e recorrência</small></span>";
+      nav.append(button); button.addEventListener("click", serviceEditor);
+    }
   }
   const frameStyle = (image) => `object-fit:${image.fit === "cover" ? "cover" : "contain"};object-position:${Number(image.position_x ?? 50)}% ${Number(image.position_y ?? 50)}%;transform-origin:${Number(image.position_x ?? 50)}% ${Number(image.position_y ?? 50)}%;transform:scale(${Number(image.zoom ?? 100) / 100})`;
   function drawMedia(grid, images, refresh) {
@@ -97,6 +103,28 @@
           await api("/api/content", {method: "PUT", body: JSON.stringify({testimonials, partners, insights})}); dashboard();
         } catch (reason) { error.textContent = reason.message; error.hidden = false; submit.disabled = false; }
       });
+    } catch (error) { sessionStorage.removeItem(tokenKey); login(error.message); }
+  }
+  const serviceCard = (service, index) => `<article class="panel-service-card"><header><span>Serviço ${String(index + 1).padStart(2, "0")}</span><button type="button" data-remove-service="${index}">Remover</button></header><div class="panel-form-grid"><div class="panel-field"><label for="service_front_${index}">Frente</label><select class="panel-control panel-select" id="service_front_${index}" data-service-front="${index}"><option value="tecnologia" ${service.front === "tecnologia" ? "selected" : ""}>Tecnologia</option><option value="marketing" ${service.front === "marketing" ? "selected" : ""}>Marketing</option><option value="integrado" ${service.front === "integrado" ? "selected" : ""}>Integrado</option></select></div><div class="panel-field"><label for="service_title_${index}">Nome do serviço</label><input class="panel-control" id="service_title_${index}" data-service-title="${index}" maxlength="120" value="${esc(service.title)}" placeholder="Ex.: Desenvolvimento de sites"></div><div class="panel-field panel-field--full"><label for="service_summary_${index}">Descrição</label><textarea class="panel-control" id="service_summary_${index}" data-service-summary="${index}" maxlength="500" placeholder="O que este serviço entrega e para quem.">${esc(service.summary)}</textarea></div><div class="panel-field"><label for="service_price_${index}">Valor inicial <span class="optional">opcional</span></label><input class="panel-control" id="service_price_${index}" data-service-price="${index}" maxlength="80" value="${esc(service.starting_price)}" placeholder="Ex.: A partir de R$ 3.500"></div><div class="panel-field"><label for="service_support_price_${index}">Valor recorrente <span class="optional">opcional</span></label><input class="panel-control" id="service_support_price_${index}" data-service-support-price="${index}" maxlength="80" value="${esc(service.support_price)}" placeholder="Ex.: A partir de R$ 490/mês"></div><div class="panel-field panel-field--full"><label for="service_support_${index}">Suporte à rotina <span class="optional">opcional</span></label><textarea class="panel-control" id="service_support_${index}" data-service-support="${index}" maxlength="280" placeholder="Ex.: manutenção mensal, evolução contínua e acompanhamento de indicadores.">${esc(service.support_summary)}</textarea></div><label class="panel-checkbox-field panel-field--full"><input class="panel-checkbox" type="checkbox" data-service-visible="${index}" ${service.visible ? "checked" : ""}><span><strong>Exibir no site</strong><span>O serviço aparecerá na seção pública correspondente.</span></span></label></div></article>`;
+  async function serviceEditor() {
+    try {
+      const response = await api("/api/services");
+      let services = (response.services || []).map((service) => ({front: "tecnologia", title: "", summary: "", starting_price: "", support_summary: "", support_price: "", visible: false, ...service}));
+      const render = () => {
+        root.innerHTML = shell(`<main class="panel-page"><header class="panel-page-header panel-editor-header"><div><button class="panel-back-link" type="button" data-back-to-cases>← Voltar para cases</button><p class="panel-kicker">Catálogo comercial</p><h1>Serviços da Prisma.</h1><p>Cadastre entregas, valor inicial e como cada serviço pode receber suporte contínuo.</p></div><button class="button" type="button" data-add-service>Novo serviço <span>+</span></button></header><form data-service-settings><section class="panel-service-list">${services.length ? services.map(serviceCard).join("") : '<div class="panel-empty-state"><p class="panel-kicker">Catálogo vazio</p><h3>Cadastre a primeira entrega.</h3><p>Você pode incluir valor inicial e condições de suporte recorrente.</p></div>'}</section><p class="panel-form-alert" hidden data-form-error></p><div class="panel-form-actions"><button class="panel-cancel" type="button" data-back-to-cases>Cancelar</button><button class="button" type="submit">Salvar serviços <span>↗</span></button></div></form></main>`);
+        controls(); root.querySelectorAll("[data-back-to-cases]").forEach((button) => button.addEventListener("click", dashboard));
+        root.querySelector("[data-add-service]").addEventListener("click", () => { if (services.length >= 24) return alert("O catálogo aceita até 24 serviços."); services.push({front: "tecnologia", title: "", summary: "", starting_price: "", support_summary: "", support_price: "", visible: false}); render(); });
+        root.querySelectorAll("[data-remove-service]").forEach((button) => button.addEventListener("click", () => { services.splice(Number(button.dataset.removeService), 1); render(); }));
+        root.querySelector("[data-service-settings]").addEventListener("submit", async (event) => {
+          event.preventDefault(); const form = event.currentTarget, error = form.querySelector("[data-form-error]"), submit = form.querySelector("button[type=submit]"); error.hidden = true; submit.disabled = true;
+          try {
+            const value = (name, index) => root.querySelector(`[data-${name}="${index}"]`).value.trim(), checked = (name, index) => root.querySelector(`[data-${name}="${index}"]`).checked;
+            services = services.map((service, index) => ({...service, front: value("service-front", index), title: value("service-title", index), summary: value("service-summary", index), starting_price: value("service-price", index), support_price: value("service-support-price", index), support_summary: value("service-support", index), visible: checked("service-visible", index)}));
+            await api("/api/services", {method: "PUT", body: JSON.stringify(services)}); dashboard();
+          } catch (reason) { error.textContent = reason.message; error.hidden = false; submit.disabled = false; }
+        });
+      };
+      render();
     } catch (error) { sessionStorage.removeItem(tokenKey); login(error.message); }
   }
   const initials = (name = "") => name.trim().split(/\s+/).filter(Boolean).slice(0, 2).map((word) => word[0]).join("").toUpperCase() || "P";

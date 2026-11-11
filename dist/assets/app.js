@@ -27,8 +27,27 @@
     });
     applyContact(state.contact);
     applyTeam(state.team);
+    applyServices(state.services);
     applyContent(state.content);
     return {state, cases};
+  }
+  function applyServices(services = []) {
+    const published = Array.isArray(services) ? services.filter((service) => service.title && service.summary) : [];
+    if (!published.length) return;
+    const container = document.querySelector(".service-groups");
+    if (!container) return;
+    const groups = [
+      {key: "marketing", title: "Marketing", eyebrow: "Estratégia, marca e comunicação", link: "/frentes/marketing/"},
+      {key: "tecnologia", title: "Tecnologia", eyebrow: "Produtos, dados e operações", link: "/frentes/tecnologia/"},
+      {key: "integrado", title: "Soluções integradas", eyebrow: "Marketing e tecnologia em conjunto", link: "#contato"}
+    ];
+    const card = (service, index) => `<article class="service-card service-card--catalog" data-reveal><span class="service-index">${String(index + 1).padStart(2, "0")}</span><div class="service-icon service-icon--prism"><span></span><span></span><span></span></div><h4>${escape(service.title)}</h4><p>${escape(service.summary)}</p>${service.starting_price || service.support_summary || service.support_price ? `<div class="service-commercial">${service.starting_price ? `<p><span>Valor inicial</span><strong>${escape(service.starting_price)}</strong></p>` : ""}${service.support_summary || service.support_price ? `<p><span>Suporte à rotina</span>${service.support_summary ? `<small>${escape(service.support_summary)}</small>` : ""}${service.support_price ? `<strong>${escape(service.support_price)}</strong>` : ""}</p>` : ""}</div>` : ""}</article>`;
+    container.innerHTML = groups.map((group) => {
+      const items = published.filter((service) => service.front === group.key);
+      if (!items.length) return "";
+      return `<section class="service-front service-front--${group.key}" data-reveal><header class="service-front__header"><div><p class="eyebrow"><span></span>${group.eyebrow}</p><h3>${group.title}</h3></div><a class="text-link" href="${group.link}">${group.key === "integrado" ? "Conversar sobre um projeto" : "Conhecer a frente"} <span>→</span></a></header><div class="service-grid service-grid--front">${items.map(card).join("")}</div></section>`;
+    }).filter(Boolean).join("");
+    reveal(container);
   }
   function applyContent(content = {}) {
     document.querySelectorAll("[data-dynamic-content]").forEach((element) => element.remove());

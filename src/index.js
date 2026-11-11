@@ -4,6 +4,7 @@ import * as content from "../functions/api/content.js";
 import * as media from "../functions/api/media.js";
 import * as session from "../functions/api/session.js";
 import * as settings from "../functions/api/settings.js";
+import * as services from "../functions/api/services.js";
 import * as team from "../functions/api/team.js";
 import * as site from "../functions/api/site.js";
 
@@ -23,6 +24,7 @@ export default {
     if (url.pathname === "/api/cases") return cases.onRequest(context);
     if (url.pathname === "/api/settings") return settings.onRequest(context);
     if (url.pathname === "/api/content") return content.onRequest(context);
+    if (url.pathname === "/api/services") return services.onRequest(context);
     if (url.pathname === "/api/team") return team.onRequest(context);
     if (url.pathname === "/api/media" || url.pathname.startsWith("/api/media/")) return media.onRequest(context);
     if (url.pathname === "/api/contact" && request.method === "POST") return contact.onRequestPost(context);

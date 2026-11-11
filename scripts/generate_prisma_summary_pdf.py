@@ -74,7 +74,7 @@ def build():
     story += [
         paragraph("DOCUMENTAÇÃO DE ENTREGA", styles["Kicker"]),
         paragraph("Prisma - resumo de desenvolvimento", styles["TitlePrisma"]),
-        paragraph("Portfólio institucional com painel editorial personalizado, persistência em Cloudflare e gestão de conteúdo autorizada.", styles["BodyPrisma"]),
+        paragraph("Portfólio institucional com painel editorial personalizado, catálogo comercial, persistência em Cloudflare e gestão de conteúdo autorizada.", styles["BodyPrisma"]),
         Spacer(1, 7),
     ]
     banner = Table([[paragraph("<b>STATUS</b><br/>Site publicado e integrado ao Cloudflare Worker", styles["BodyPrisma"]), paragraph("<b>ATUALIZADO EM</b><br/>%s" % date.today().strftime("%d/%m/%Y"), styles["BodyPrisma"]), paragraph("<b>PAINEL</b><br/>/painel/", styles["BodyPrisma"])]], colWidths=[6.2 * cm, 4.7 * cm, 4.9 * cm])
@@ -129,6 +129,7 @@ def build():
     steps = [
         "Acesse <b>/painel/</b> com a senha editorial configurada nos Secrets do Cloudflare.",
         "Em <b>Cases</b>, crie ou edite um case, envie até cinco imagens e, se houver dados aprovados, preencha os impactos e resultados.",
+        "Em <b>Serviços</b>, cadastre o catálogo comercial: frente, descrição, valor inicial, suporte à rotina e valor recorrente.",
         "Em <b>Sobre nós</b>, preencha os três perfis. A foto é opcional; nome, cargo e bio ficam ao lado dela no site.",
         "Em <b>Dados de contato</b>, atualize os canais exibidos no rodapé.",
         "Em <b>Conteúdos</b>, cadastre depoimentos, marcas e insights. Publique somente o que tiver autorização de uso e dados confirmados.",

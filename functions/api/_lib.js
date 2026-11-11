@@ -8,7 +8,7 @@ const defaultContent = () => ({testimonials: [], partners: [], insights: []});
 
 export function normaliseState(state = {}) {
   const members = Array.isArray(state.team) ? state.team : [];
-  return {cases: Array.isArray(state.cases) ? state.cases : [], contact: {...defaultContact, ...(state.contact || {})}, team: defaultTeam().map((member, index) => ({...member, ...(members[index] || {}), id: member.id})), content: {...defaultContent(), ...(state.content || {})}};
+  return {cases: Array.isArray(state.cases) ? state.cases : [], contact: {...defaultContact, ...(state.contact || {})}, team: defaultTeam().map((member, index) => ({...member, ...(members[index] || {}), id: member.id})), content: {...defaultContent(), ...(state.content || {})}, services: Array.isArray(state.services) ? state.services : []};
 }
 
 export function database(env) {
