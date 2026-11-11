@@ -26,7 +26,19 @@
       reveal(container);
     });
     applyContact(state.contact);
+    applyTeam(state.team);
     return {state, cases};
+  }
+  function applyTeam(team = []) {
+    document.querySelector("[data-about-section]")?.remove();
+    document.querySelector("[data-about-link]")?.remove();
+    const members = Array.isArray(team) ? team.filter((member) => member.name) : [];
+    if (!members.length) return;
+    const portfolio = document.querySelector("#portfolio");
+    if (!portfolio) return;
+    const card = (member, index) => `<article class="team-member${index % 2 ? " team-member--reverse" : ""}" data-reveal><div class="team-member__photo">${member.photo?.url ? `<img src="${escape(member.photo.url)}" alt="Retrato de ${escape(member.name)}" loading="lazy">` : `<span>${escape(member.name.slice(0, 1).toUpperCase())}</span>`}</div><div class="team-member__copy"><p class="eyebrow"><span></span>${escape(member.role || "Equipe Prisma")}</p><h3>${escape(member.name)}</h3>${member.bio ? `<p>${escape(member.bio).replace(/\n/g, "<br>")}</p>` : ""}</div></article>`;
+    portfolio.insertAdjacentHTML("beforebegin", `<section class="section about-team" id="sobre" data-about-section><div class="container"><div class="section-heading about-team__heading" data-reveal><div><p class="eyebrow"><span></span>Sobre nós</p><h2>Pessoas que dão <em>forma à Prisma.</em></h2></div><p>Estratégia, criatividade e tecnologia reunidas para transformar contextos complexos em caminhos possíveis.</p></div><div class="team-list">${members.map(card).join("")}</div></div></section>`);
+    document.querySelector(".primary-nav")?.insertAdjacentHTML("beforeend", '<a href="#sobre" data-about-link>Sobre nós</a>');
   }
   function applyContact(contact = {}) {
     document.querySelector(".contact-copy")?.querySelectorAll(".contact-detail").forEach((element) => element.remove());

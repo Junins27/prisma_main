@@ -26,6 +26,12 @@
       button.innerHTML = "<span><strong>Dados de contato</strong><small>Canais públicos da Prisma</small></span>";
       nav.append(button); button.addEventListener("click", contacts);
     }
+    if (nav && !nav.querySelector("[data-show-team]")) {
+      const button = document.createElement("button");
+      button.type = "button"; button.className = "panel-nav-action"; button.dataset.showTeam = "";
+      button.innerHTML = "<span><strong>Sobre nós</strong><small>Perfis da equipe</small></span>";
+      nav.append(button); button.addEventListener("click", teamEditor);
+    }
   }
   const frameStyle = (image) => `object-fit:${image.fit === "cover" ? "cover" : "contain"};object-position:${Number(image.position_x ?? 50)}% ${Number(image.position_y ?? 50)}%;transform-origin:${Number(image.position_x ?? 50)}% ${Number(image.position_y ?? 50)}%;transform:scale(${Number(image.zoom ?? 100) / 100})`;
   function drawMedia(grid, images, refresh) {
@@ -56,6 +62,44 @@
         event.preventDefault(); const form = event.currentTarget, error = form.querySelector("[data-form-error]"); error.hidden = true;
         try { await api("/api/settings", {method: "PUT", body: JSON.stringify(Object.fromEntries(new FormData(form)))}); dashboard(); }
         catch (reason) { error.textContent = reason.message; error.hidden = false; }
+      });
+    } catch (error) { sessionStorage.removeItem(tokenKey); login(error.message); }
+  }
+  const initials = (name = "") => name.trim().split(/\s+/).filter(Boolean).slice(0, 2).map((word) => word[0]).join("").toUpperCase() || "P";
+  const teamCard = (member, index) => `<article class="panel-team-card" data-team-card="${index}"><div class="panel-team-card__photo" data-team-preview="${index}">${member.preview || member.photo?.url ? `<img src="${esc(member.preview || member.photo.url)}" alt="">` : `<span>${esc(initials(member.name))}</span>`}</div><div class="panel-team-card__heading"><span>Perfil ${index + 1}</span><button type="button" data-remove-team-photo="${index}" ${member.photo || member.preview ? "" : "hidden"}>Remover foto</button></div><div class="panel-field"><label for="team_photo_${index}">Foto <span class="optional">opcional</span></label><input class="panel-control panel-file" id="team_photo_${index}" type="file" accept="image/jpeg,image/png,image/webp,image/avif" data-team-photo="${index}"></div><div class="panel-field"><label for="team_name_${index}">Nome</label><input class="panel-control" id="team_name_${index}" maxlength="100" value="${esc(member.name)}" data-team-name="${index}" placeholder="Nome da pessoa"></div><div class="panel-field"><label for="team_role_${index}">Cargo</label><input class="panel-control" id="team_role_${index}" maxlength="100" value="${esc(member.role)}" data-team-role="${index}" placeholder="Ex.: Direção de arte"></div><div class="panel-field"><label for="team_bio_${index}">Breve bio</label><textarea class="panel-control" id="team_bio_${index}" maxlength="700" data-team-bio="${index}" placeholder="Apresente a pessoa em poucas linhas.">${esc(member.bio)}</textarea></div></article>`;
+  async function teamEditor() {
+    try {
+      const response = await api("/api/team");
+      const members = [0, 1, 2].map((index) => ({id: `member-${index + 1}`, name: "", role: "", bio: "", photo: null, ...(response.team?.[index] || {})}));
+      root.innerHTML = shell(`<main class="panel-page"><header class="panel-page-header panel-editor-header"><div><button class="panel-back-link" type="button" data-back-to-cases>← Voltar para cases</button><p class="panel-kicker">Identidade da Prisma</p><h1>Sobre nós.</h1><p>Apresente até três pessoas que dão forma ao trabalho da Prisma.</p></div></header><form data-team-settings><section class="panel-team-list">${members.map(teamCard).join("")}</section><p class="panel-form-alert" hidden data-form-error></p><div class="panel-form-actions"><button class="panel-cancel" type="button" data-back-to-cases>Cancelar</button><button class="button" type="submit">Salvar equipe <span>↗</span></button></div></form></main>`);
+      controls();
+      root.querySelectorAll("[data-back-to-cases]").forEach((button) => button.addEventListener("click", dashboard));
+      const refresh = () => {
+        members.forEach((member, index) => {
+          const preview = root.querySelector(`[data-team-preview="${index}"]`);
+          const remove = root.querySelector(`[data-remove-team-photo="${index}"]`);
+          if (preview) preview.innerHTML = member.preview || member.photo?.url ? `<img src="${esc(member.preview || member.photo.url)}" alt="">` : `<span>${esc(initials(member.name))}</span>`;
+          if (remove) remove.hidden = !(member.preview || member.photo);
+        });
+      };
+      root.querySelectorAll("[data-team-photo]").forEach((field) => field.addEventListener("change", () => {
+        const index = Number(field.dataset.teamPhoto), file = field.files?.[0];
+        if (!file) return;
+        if (!/image\/(avif|jpeg|png|webp)/.test(file.type)) { alert("Envie uma imagem JPG, PNG, WebP ou AVIF."); field.value = ""; return; }
+        if (file.size > 8 * 1024 * 1024) { alert("A foto pode ter no máximo 8 MB."); field.value = ""; return; }
+        members[index].file = file; members[index].preview = URL.createObjectURL(file); refresh();
+      }));
+      root.querySelectorAll("[data-remove-team-photo]").forEach((button) => button.addEventListener("click", () => {
+        const member = members[Number(button.dataset.removeTeamPhoto)]; delete member.file; delete member.preview; member.photo = null; refresh();
+      }));
+      root.querySelectorAll("[data-team-name]").forEach((field) => field.addEventListener("input", () => { members[Number(field.dataset.teamName)].name = field.value; refresh(); }));
+      root.querySelector("[data-team-settings]").addEventListener("submit", async (event) => {
+        event.preventDefault(); const form = event.currentTarget, error = form.querySelector("[data-form-error]"), submit = form.querySelector("button[type=submit]"); error.hidden = true; submit.disabled = true;
+        try {
+          members.forEach((member, index) => { member.name = root.querySelector(`[data-team-name="${index}"]`).value.trim(); member.role = root.querySelector(`[data-team-role="${index}"]`).value.trim(); member.bio = root.querySelector(`[data-team-bio="${index}"]`).value.trim(); });
+          for (const member of members.filter((member) => member.file)) { const upload = new FormData(); upload.append("scope", "team"); upload.append("image", member.file); const {image} = await api("/api/media", {method: "POST", body: upload}); member.photo = image; delete member.file; delete member.preview; }
+          await api("/api/team", {method: "PUT", body: JSON.stringify(members.map(({name, role, bio, photo}) => ({name, role, bio, photo})))}); dashboard();
+        } catch (reason) { error.textContent = reason.message; error.hidden = false; submit.disabled = false; }
       });
     } catch (error) { sessionStorage.removeItem(tokenKey); login(error.message); }
   }
